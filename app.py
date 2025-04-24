@@ -234,12 +234,14 @@ def generate_pdf_report(df, report_title, start_date, end_date, selected_persona
         pdf.cell(20, 6, f"{row['horas']:.1f}", 1, 1, 'R')
 
     # Crear buffer de bytes para el PDF
-    pdf_output = io.BytesIO()
-    pdf.output(dest=pdf_output)
+    pdf_bytes = pdf.output(dest='S').encode('latin1')
+    pdf_output.write(pdf_bytes)
+    pdf_output.seek(0)  # Regresamos al inicio del buffer
     pdf_bytes = pdf_output.getvalue()
     pdf_output.close()
     return pdf_bytes
-
+  
+    
 # Título del dashboard
 st.markdown('<div class="main-header">Dashboard de Seguimiento de Actividades</div>', unsafe_allow_html=True)
 
