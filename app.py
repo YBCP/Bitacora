@@ -235,10 +235,6 @@ def generate_pdf_report(df, report_title, start_date, end_date, selected_persona
 
     # Crear buffer de bytes para el PDF
     pdf_bytes = pdf.output(dest='S').encode('latin1')
-    pdf_output.write(pdf_bytes)
-    pdf_output.seek(0)  # Regresamos al inicio del buffer
-    pdf_bytes = pdf_output.getvalue()
-    pdf_output.close()
     return pdf_bytes
   
     
