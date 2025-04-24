@@ -128,6 +128,7 @@ def get_pdf_download_link(pdf_bytes, filename, text):
 
 
 # Función para generar un reporte en PDF
+
 def generate_pdf_report(df, report_title, start_date, end_date, selected_personas):
     class PDF(FPDF):
         def header(self):
@@ -234,11 +235,10 @@ def generate_pdf_report(df, report_title, start_date, end_date, selected_persona
 
     # Crear buffer de bytes para el PDF
     pdf_output = io.BytesIO()
-    pdf.output(pdf_output)
+    pdf.output(dest=pdf_output)
     pdf_bytes = pdf_output.getvalue()
     pdf_output.close()
     return pdf_bytes
-
 
 # Título del dashboard
 st.markdown('<div class="main-header">Dashboard de Seguimiento de Actividades</div>', unsafe_allow_html=True)
