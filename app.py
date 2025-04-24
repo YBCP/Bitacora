@@ -58,18 +58,29 @@ if 'data' not in st.session_state:
     dates = [start_date + timedelta(days=i) for i in range(30)]
 
     # Lista de personas
-    personas = ["Ana", "Carlos", "Elena", "Daniel", "Sofia"]
+    personas = ["Cesar Ramirez","Cristian Martínez","Nestor Roldan","Hernan Bernal","Daniel Morales","Leila Awad","Ninfa Carolina Menjura","Yair Morales","Daniel Gonzalez","Diana Carvajal","Diego Marin","Jairo Perdomo","Laura Rodríguez","Luz Carolina Galvis","Maria Bernate","Martha Vargas"]
 
     # Proyectos de ejemplo
-    proyectos = ["Website Redesign", "App Móvil", "Sistema CRM", "Análisis de Datos", "Marketing Digital"]
+    proyectos = ["Datos Temáticos", "Cartografía", "Análisis de Datos", "Mapa de Referencia"]
 
     # Actividades personalizadas por persona
     actividades_personalizadas = {
-        "Ana": ["Desarrollo Frontend", "Diseño UI", "Code Review", "Reuniones"],
-        "Carlos": ["Desarrollo Backend", "Documentación API", "Soporte Técnico", "Reuniones"],
-        "Elena": ["Testing", "Automatización", "Reportes", "Planificación"],
-        "Daniel": ["Análisis de Datos", "Visualización", "Investigación", "Coordinación"],
-        "Sofia": ["Gestión de Proyectos", "Comunicación Cliente", "Seguimiento", "Capacitación"]
+    "Cesar Ramirez": ["Trabajo autónomo", "Reuniones"],
+    "Cristian Martínez": ["Trabajo autónomo", "Reuniones"],
+    "Nestor Roldan": ["Trabajo autónomo", "Reuniones"],
+    "Hernan Bernal": ["Trabajo autónomo", "Reuniones"],
+    "Daniel Morales": ["Trabajo autónomo", "Reuniones"],
+    "Leila Awad": ["Trabajo autónomo", "Reuniones"],
+    "Ninfa Carolina Menjura": ["Trabajo autónomo", "Reuniones"],
+    "Yair Morales": ["Trabajo autónomo", "Reuniones"],
+    "Daniel Gonzalez": ["Trabajo autónomo", "Reuniones"],
+    "Diana Carvajal": ["Trabajo autónomo", "Reuniones"],
+    "Diego Marin": ["Trabajo autónomo", "Reuniones"],
+    "Jairo Perdomo": ["Trabajo autónomo", "Reuniones"],
+    "Laura Rodríguez": ["Trabajo autónomo", "Reuniones"],
+    "Luz Carolina Galvis": ["Trabajo autónomo", "Reuniones"],
+    "Maria Bernate": ["Trabajo autónomo", "Reuniones"],
+    "Martha Vargas": ["Trabajo autónomo", "Reuniones"],
     }
 
     # Guardar las actividades personalizadas en la sesión
