@@ -10,6 +10,7 @@ import json
 from fpdf import FPDF
 import matplotlib.pyplot as plt
 from io import BytesIO
+import hashlib
 
 # Configuración de la página
 st.set_page_config(
