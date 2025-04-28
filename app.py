@@ -47,8 +47,22 @@ st.markdown("""
             padding: 20px;
             margin-top: 30px;
         }
+        .password-container {
+            background-color: #ffebee;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
     </style>
     """, unsafe_allow_html=True)
+
+# Inicializar la contraseña (en una aplicación real, usarías un método más seguro)
+REPORT_PASSWORD_HASH = hashlib.sha256("admin123".encode()).hexdigest()
+
+# Función para verificar la contraseña
+def verify_password(input_password):
+    input_hash = hashlib.sha256(input_password.encode()).hexdigest()
+    return input_hash == REPORT_PASSWORD_HASH
 
 # Inicialización de datos en la sesión
 if 'data' not in st.session_state:
@@ -110,6 +124,9 @@ if 'data' not in st.session_state:
 
     # Guardar la lista de proyectos en la sesión
     st.session_state.proyectos = proyectos
+    
+    # Inicializar el estado de la contraseña
+    st.session_state.password_verified = False
 
 
 # Función para crear un link de descarga
@@ -127,8 +144,74 @@ def get_pdf_download_link(pdf_bytes, filename, text):
     return href
 
 
-# Función para generar un reporte en PDF
+# Función para identificar festivos en Colombia
+def es_festivo_colombia(fecha):
+    # Lista de festivos en Colombia para 2024-2025
+    festivos = [
+        # 2024
+        datetime(2024, 1, 1).date(),  # Año Nuevo
+        datetime(2024, 1, 8).date(),  # Día de los Reyes Magos
+        datetime(2024, 3, 25).date(),  # Día de San José
+        datetime(2024, 3, 28).date(),  # Jueves Santo
+        datetime(2024, 3, 29).date(),  # Viernes Santo
+        datetime(2024, 5, 1).date(),  # Día del Trabajo
+        datetime(2024, 5, 13).date(),  # Día de la Ascensión
+        datetime(2024, 6, 3).date(),  # Corpus Christi
+        datetime(2024, 6, 10).date(),  # Sagrado Corazón
+        datetime(2024, 7, 1).date(),  # San Pedro y San Pablo
+        datetime(2024, 7, 20).date(),  # Día de la Independencia
+        datetime(2024, 8, 7).date(),  # Batalla de Boyacá
+        datetime(2024, 8, 19).date(),  # Asunción de la Virgen
+        datetime(2024, 10, 14).date(),  # Día de la Raza
+        datetime(2024, 11, 4).date(),  # Todos los Santos
+        datetime(2024, 11, 11).date(),  # Independencia de Cartagena
+        datetime(2024, 12, 8).date(),  # Día de la Inmaculada Concepción
+        datetime(2024, 12, 25).date(),  # Navidad
+        # 2025
+        datetime(2025, 1, 1).date(),  # Año Nuevo
+        datetime(2025, 1, 6).date(),  # Día de los Reyes Magos
+        datetime(2025, 3, 24).date(),  # Día de San José
+        datetime(2025, 4, 17).date(),  # Jueves Santo
+        datetime(2025, 4, 18).date(),  # Viernes Santo
+        datetime(2025, 5, 1).date(),  # Día del Trabajo
+        datetime(2025, 6, 2).date(),  # Día de la Ascensión
+        datetime(2025, 6, 23).date(),  # Corpus Christi
+        datetime(2025, 6, 30).date(),  # Sagrado Corazón
+        datetime(2025, 7, 20).date(),  # Día de la Independencia
+        datetime(2025, 8, 7).date(),  # Batalla de Boyacá
+        datetime(2025, 8, 18).date(),  # Asunción de la Virgen
+        datetime(2025, 10, 13).date(),  # Día de la Raza
+        datetime(2025, 11, 3).date(),  # Todos los Santos
+        datetime(2025, 11, 17).date(),  # Independencia de Cartagena
+        datetime(2025, 12, 8).date(),  # Día de la Inmaculada Concepción
+        datetime(2025, 12, 25).date(),  # Navidad
+    ]
+    return fecha in festivos
 
+
+# Función para determinar si un día es laboral (no es fin de semana ni festivo)
+def es_dia_laboral(fecha):
+    # Verificar si no es sábado (5) ni domingo (6)
+    if fecha.weekday() >= 5:
+        return False
+    # Verificar si no es festivo en Colombia
+    if es_festivo_colombia(fecha):
+        return False
+    return True
+
+
+# Función para calcular días laborables entre dos fechas
+def dias_laborables_entre_fechas(fecha_inicio, fecha_fin):
+    dias_laborables = 0
+    fecha_actual = fecha_inicio
+    while fecha_actual <= fecha_fin:
+        if es_dia_laboral(fecha_actual):
+            dias_laborables += 1
+        fecha_actual += timedelta(days=1)
+    return dias_laborables
+
+
+# Función modificada para generar un reporte en PDF
 def generate_pdf_report(df, report_title, start_date, end_date, selected_personas):
     class PDF(FPDF):
         def header(self):
@@ -154,16 +237,25 @@ def generate_pdf_report(df, report_title, start_date, end_date, selected_persona
     pdf.cell(0, 10, report_title, 0, 1)
     pdf.ln(5)
 
+    # Calcular días laborables en el período
+    dias_lab = dias_laborables_entre_fechas(start_date, end_date)
+
     # Resumen general
     pdf.set_font('Arial', 'B', 14)
     pdf.cell(0, 10, "Resumen General", 0, 1)
     pdf.set_font('Arial', '', 11)
 
     total_horas = df['horas'].sum()
-    promedio_diario = df.groupby('fecha')['horas'].sum().mean()
+
+    # Calcular promedio diario solo considerando días laborables
+    if dias_lab > 0:
+        promedio_diario_laboral = df.groupby('fecha')['horas'].sum().sum() / dias_lab
+    else:
+        promedio_diario_laboral = 0
 
     pdf.cell(0, 8, f"Total de horas registradas: {total_horas:.1f}", 0, 1)
-    pdf.cell(0, 8, f"Promedio diario de horas: {promedio_diario:.1f}", 0, 1)
+    pdf.cell(0, 8, f"Días laborables en el período: {dias_lab}", 0, 1)
+    pdf.cell(0, 8, f"Promedio diario de horas (días laborables): {promedio_diario_laboral:.1f}", 0, 1)
     pdf.cell(0, 8, f"Personas incluidas: {', '.join(selected_personas)}", 0, 1)
     pdf.ln(5)
 
@@ -178,35 +270,106 @@ def generate_pdf_report(df, report_title, start_date, end_date, selected_persona
             pdf.cell(0, 10, f"{persona}", 0, 1)
             pdf.set_font('Arial', '', 11)
 
-            # Horas totales por proyecto para esta persona
+            # Horas totales para esta persona
             pdf.cell(0, 8, f"Total de horas: {persona_df['horas'].sum():.1f}", 0, 1)
 
-            # Tabla de horas por proyecto
+            # Promedio de horas diarias considerando días laborables
+            if dias_lab > 0:
+                promedio_persona = persona_df['horas'].sum() / dias_lab
+                pdf.cell(0, 8, f"Promedio de horas diarias (días laborables): {promedio_persona:.1f}", 0, 1)
+
+            # Tabla de horas por proyecto con promedio diario
             proyectos_persona = persona_df.groupby('proyecto')['horas'].sum().reset_index()
             proyectos_persona = proyectos_persona.sort_values('horas', ascending=False)
 
+            # Agregar columna de promedio diario
+            proyectos_persona['promedio_diario'] = proyectos_persona['horas'] / dias_lab if dias_lab > 0 else 0
+
+            pdf.ln(5)
             pdf.set_font('Arial', 'B', 10)
-            pdf.cell(100, 8, "Proyecto", 1, 0, 'C')
-            pdf.cell(40, 8, "Horas", 1, 1, 'C')
+            pdf.cell(80, 8, "Proyecto", 1, 0, 'C')
+            pdf.cell(30, 8, "Horas Totales", 1, 0, 'C')
+            pdf.cell(30, 8, "Prom. Diario", 1, 1, 'C')
 
             pdf.set_font('Arial', '', 10)
             for _, row in proyectos_persona.iterrows():
-                pdf.cell(100, 8, row['proyecto'], 1, 0)
-                pdf.cell(40, 8, f"{row['horas']:.1f}", 1, 1, 'R')
+                pdf.cell(80, 8, row['proyecto'], 1, 0)
+                pdf.cell(30, 8, f"{row['horas']:.1f}", 1, 0, 'R')
+                pdf.cell(30, 8, f"{row['promedio_diario']:.1f}", 1, 1, 'R')
 
-            # Tabla de horas por actividad
+            # Tabla de horas por actividad con promedio diario
             pdf.ln(5)
             actividades_persona = persona_df.groupby('actividad')['horas'].sum().reset_index()
             actividades_persona = actividades_persona.sort_values('horas', ascending=False)
 
+            # Agregar columna de promedio diario
+            actividades_persona['promedio_diario'] = actividades_persona['horas'] / dias_lab if dias_lab > 0 else 0
+
             pdf.set_font('Arial', 'B', 10)
-            pdf.cell(100, 8, "Actividad", 1, 0, 'C')
-            pdf.cell(40, 8, "Horas", 1, 1, 'C')
+            pdf.cell(80, 8, "Actividad", 1, 0, 'C')
+            pdf.cell(30, 8, "Horas Totales", 1, 0, 'C')
+            pdf.cell(30, 8, "Prom. Diario", 1, 1, 'C')
 
             pdf.set_font('Arial', '', 10)
             for _, row in actividades_persona.iterrows():
-                pdf.cell(100, 8, row['actividad'], 1, 0)
-                pdf.cell(40, 8, f"{row['horas']:.1f}", 1, 1, 'R')
+                pdf.cell(80, 8, row['actividad'], 1, 0)
+                pdf.cell(30, 8, f"{row['horas']:.1f}", 1, 0, 'R')
+                pdf.cell(30, 8, f"{row['promedio_diario']:.1f}", 1, 1, 'R')
+
+            pdf.ln(10)
+
+            # Detalle de actividad y proyecto combinados
+            pdf.set_font('Arial', 'B', 11)
+            pdf.cell(0, 8, "Detalle de Actividades por Proyecto", 0, 1)
+
+            # Crear tabla cruzada de actividades y proyectos
+            act_proy_pivot = pd.pivot_table(
+                persona_df,
+                values='horas',
+                index=['actividad'],
+                columns=['proyecto'],
+                aggfunc='sum',
+                fill_value=0
+            ).reset_index()
+
+            # Agregar el promedio diario para cada combinación
+            pdf.set_font('Arial', 'B', 9)
+            header_width = 50
+            column_width = 35
+
+            # Cabecera de la tabla
+            pdf.cell(header_width, 8, "Actividad", 1, 0, 'C')
+
+            # Obtener lista de proyectos para esta persona
+            proyectos_de_persona = sorted(persona_df['proyecto'].unique())
+
+            for proyecto in proyectos_de_persona:
+                pdf.cell(column_width, 4, proyecto, 1, 0, 'C')
+            pdf.ln(4)
+
+            # Segunda línea de la cabecera
+            pdf.cell(header_width, 4, "", 0, 0)
+            for _ in proyectos_de_persona:
+                pdf.cell(column_width / 2, 4, "Total", 1, 0, 'C')
+                pdf.cell(column_width / 2, 4, "Prom", 1, 0, 'C')
+            pdf.ln(4)
+
+            # Contenido de la tabla
+            pdf.set_font('Arial', '', 9)
+            actividades_de_persona = sorted(persona_df['actividad'].unique())
+
+            for actividad in actividades_de_persona:
+                pdf.cell(header_width, 8, actividad, 1, 0)
+
+                for proyecto in proyectos_de_persona:
+                    # Filtrar por actividad y proyecto
+                    horas = persona_df[(persona_df['actividad'] == actividad) &
+                                       (persona_df['proyecto'] == proyecto)]['horas'].sum()
+                    promedio = horas / dias_lab if dias_lab > 0 else 0
+
+                    pdf.cell(column_width / 2, 8, f"{horas:.1f}", 1, 0, 'R')
+                    pdf.cell(column_width / 2, 8, f"{promedio:.1f}", 1, 0, 'R')
+                pdf.ln(8)
 
             pdf.ln(10)
 
@@ -218,26 +381,68 @@ def generate_pdf_report(df, report_title, start_date, end_date, selected_persona
     # Preparar una versión simplificada del DataFrame para la tabla
     df_for_table = df.sort_values(['persona', 'fecha', 'proyecto'])
 
+    # Marcar días no laborables
+    df_for_table['es_laboral'] = df_for_table['fecha'].apply(es_dia_laboral)
+
     pdf.set_font('Arial', 'B', 8)
     pdf.cell(25, 8, "Fecha", 1, 0, 'C')
+    pdf.cell(15, 8, "Laboral", 1, 0, 'C')
     pdf.cell(30, 8, "Persona", 1, 0, 'C')
-    pdf.cell(55, 8, "Proyecto", 1, 0, 'C')
-    pdf.cell(60, 8, "Actividad", 1, 0, 'C')
+    pdf.cell(45, 8, "Proyecto", 1, 0, 'C')
+    pdf.cell(55, 8, "Actividad", 1, 0, 'C')
     pdf.cell(20, 8, "Horas", 1, 1, 'C')
 
     pdf.set_font('Arial', '', 8)
     for _, row in df_for_table.iterrows():
         pdf.cell(25, 6, str(row['fecha']), 1, 0)
+        pdf.cell(15, 6, "Sí" if row['es_laboral'] else "No", 1, 0, 'C')
         pdf.cell(30, 6, row['persona'], 1, 0)
-        pdf.cell(55, 6, row['proyecto'], 1, 0)
-        pdf.cell(60, 6, row['actividad'], 1, 0)
+        pdf.cell(45, 6, row['proyecto'], 1, 0)
+        pdf.cell(55, 6, row['actividad'], 1, 0)
         pdf.cell(20, 6, f"{row['horas']:.1f}", 1, 1, 'R')
+
+    # Agregar página con resumen de días laborables
+    pdf.add_page()
+    pdf.set_font('Arial', 'B', 14)
+    pdf.cell(0, 10, "Calendario de Días Laborables", 0, 1)
+
+    # Crear una lista de todas las fechas en el rango
+    todas_fechas = []
+    fecha_actual = start_date
+    while fecha_actual <= end_date:
+        todas_fechas.append({
+            'fecha': fecha_actual,
+            'es_laboral': es_dia_laboral(fecha_actual),
+            'es_festivo': es_festivo_colombia(fecha_actual),
+            'dia_semana': ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'][
+                fecha_actual.weekday()]
+        })
+        fecha_actual += timedelta(days=1)
+
+    # Mostrar calendario
+    pdf.set_font('Arial', 'B', 10)
+    pdf.cell(25, 8, "Fecha", 1, 0, 'C')
+    pdf.cell(30, 8, "Día", 1, 0, 'C')
+    pdf.cell(25, 8, "Laborable", 1, 0, 'C')
+    pdf.cell(25, 8, "Festivo", 1, 1, 'C')
+
+    pdf.set_font('Arial', '', 10)
+    for dia in todas_fechas:
+        pdf.cell(25, 6, str(dia['fecha']), 1, 0)
+        pdf.cell(30, 6, dia['dia_semana'], 1, 0)
+        pdf.cell(25, 6, "Sí" if dia['es_laboral'] else "No", 1, 0, 'C')
+        pdf.cell(25, 6, "Sí" if dia['es_festivo'] else "No", 1, 1, 'C')
+
+    pdf.ln(10)
+    pdf.set_font('Arial', 'B', 10)
+    pdf.cell(0, 8, f"Total días en el período: {len(todas_fechas)}", 0, 1)
+    pdf.cell(0, 8, f"Días laborables: {dias_lab}", 0, 1)
+    pdf.cell(0, 8, f"Días no laborables: {len(todas_fechas) - dias_lab}", 0, 1)
 
     # Crear buffer de bytes para el PDF
     pdf_bytes = pdf.output(dest='S').encode('latin1')
     return pdf_bytes
-  
-    
+
 # Título del dashboard
 st.markdown('<div class="main-header">Dashboard de Seguimiento de Actividades</div>', unsafe_allow_html=True)
 
@@ -330,9 +535,39 @@ elif sidebar_tab == "Generación de Reportes":
 
     # Título del reporte
     report_title = st.sidebar.text_input("Título del reporte", "Reporte de Actividades")
+    
+    # Sección de verificación de contraseña
+    st.sidebar.markdown('<div class="password-container">', unsafe_allow_html=True)
+    st.sidebar.subheader("Verificación de Seguridad")
+    
+    # Verificar si la contraseña ya fue validada en esta sesión
+    if 'password_verified' not in st.session_state:
+        st.session_state.password_verified = False
+        
+    if not st.session_state.password_verified:
+        report_password = st.sidebar.text_input("Ingrese la contraseña para generar reportes", type="password")
+        verify_button = st.sidebar.button("Verificar Contraseña")
+        
+        if verify_button:
+            if verify_password(report_password):
+                st.session_state.password_verified = True
+                st.sidebar.success("¡Contraseña correcta! Ahora puedes generar reportes.")
+            else:
+                st.sidebar.error("Contraseña incorrecta. Inténtalo de nuevo.")
+    else:
+        st.sidebar.success("Contraseña verificada. Puedes generar reportes.")
+        
+        # Botón para cerrar sesión
+        if st.sidebar.button("Cerrar Sesión"):
+            st.session_state.password_verified = False
+            st.experimental_rerun()
+            
+    st.sidebar.markdown('</div>', unsafe_allow_html=True)
 
-    # Botón para generar el reporte
-    if st.sidebar.button("Generar Reporte") and len(report_dates) == 2 and report_personas:
+    # Botón para generar el reporte (solo habilitado si la contraseña fue verificada)
+    generate_button = st.sidebar.button("Generar Reporte", disabled=not st.session_state.password_verified)
+    
+    if generate_button and len(report_dates) == 2 and report_personas:
         report_start_date, report_end_date = report_dates
 
         # Filtrar datos para el reporte
@@ -361,7 +596,6 @@ elif sidebar_tab == "Generación de Reportes":
 
             # Mostrar una vista previa
             st.sidebar.success(f"Reporte generado con {len(report_data)} registros")
-
 elif sidebar_tab == "Gestión de Actividades":
     st.sidebar.header("Personalizar Actividades")
 
@@ -648,13 +882,14 @@ if sidebar_tab != "Generación de Reportes":
                 "proyecto": nuevo_proyecto,
                 "horas": nuevas_horas
             }])
-            
+
             # Actualizar DataFrame en session_state
             st.session_state.data = pd.concat([st.session_state.data, new_row], ignore_index=True)
-            
+
             # Mostrar mensaje de éxito
-            st.success(f"Actividad registrada: {nueva_persona} - {nueva_actividad} - Proyecto: {nuevo_proyecto} - {nuevas_horas} horas")
-            
+            st.success(
+                f"Actividad registrada: {nueva_persona} - {nueva_actividad} - Proyecto: {nuevo_proyecto} - {nuevas_horas} horas")
+
             # Para mostrar cómo se vería
             st.dataframe(new_row, use_container_width=True)
 
