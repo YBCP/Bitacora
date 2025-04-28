@@ -5,3 +5,12 @@ plotly
 fpdf
 matplotlib
 haslib
+plotly.express
+plotly.graph_objects
+datetime
+timedelta
+io
+base64
+json
+FPDF
+BytesIO
