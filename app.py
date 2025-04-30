@@ -11,10 +11,13 @@ from fpdf import FPDF
 import matplotlib.pyplot as plt
 from io import BytesIO
 import hashlib
+import os
+
+CSV_FILE = "registro_actividades.csv"
 
 # Configuración de la página
 st.set_page_config(
-    page_title="Dashboard de Seguimiento de Actividades",
+    page_title="Dashboard de Seguimiento de Actividades Subdirección de Operaciones",
     page_icon="📊",
     layout="wide"
 )
@@ -67,68 +70,23 @@ def verify_password(input_password):
 
 # Inicialización de datos en la sesión
 if 'data' not in st.session_state:
-    # Generar fechas para los últimos 30 días
-    end_date = datetime.now().date()
-    start_date = end_date - timedelta(days=29)
-    dates = [start_date + timedelta(days=i) for i in range(30)]
+    if os.path.exists(CSV_FILE):
+        st.session_state.data = pd.read_csv(CSV_FILE, parse_dates=["fecha"])
 
-    # Lista de personas
-    personas = ["Cesar Ramirez","Cristian Martínez","Nestor Roldan","Hernan Bernal","Daniel Morales","Leila Awad","Ninfa Carolina Menjura","Yair Morales","Daniel Gonzalez","Diana Carvajal","Diego Marin","Jairo Perdomo","Laura Rodríguez","Luz Carolina Galvis","Maria Bernate","Martha Vargas"]
+        # Obtener personas y proyectos del CSV
+        personas = sorted(st.session_state.data['persona'].unique().tolist())
+        proyectos = sorted(st.session_state.data['proyecto'].unique().tolist())
 
-    # Proyectos de ejemplo
-    proyectos = ["Datos Temáticos", "Cartografía", "Análisis de Datos", "Mapa de Referencia"]
+        # Asignar actividades por defecto (puedes ajustar esto según tus datos reales)
+        st.session_state.actividades_personalizadas = {
+            persona: ["Trabajo autónomo", "Reuniones"] for persona in personas
+        }
 
-    # Actividades personalizadas por persona
-    actividades_personalizadas = {
-    "Cesar Ramirez": ["Trabajo autónomo", "Reuniones"],
-    "Cristian Martínez": ["Trabajo autónomo", "Reuniones"],
-    "Nestor Roldan": ["Trabajo autónomo", "Reuniones"],
-    "Hernan Bernal": ["Trabajo autónomo", "Reuniones"],
-    "Daniel Morales": ["Trabajo autónomo", "Reuniones"],
-    "Leila Awad": ["Trabajo autónomo", "Reuniones"],
-    "Ninfa Carolina Menjura": ["Trabajo autónomo", "Reuniones"],
-    "Yair Morales": ["Trabajo autónomo", "Reuniones"],
-    "Daniel Gonzalez": ["Trabajo autónomo", "Reuniones"],
-    "Diana Carvajal": ["Trabajo autónomo", "Reuniones"],
-    "Diego Marin": ["Trabajo autónomo", "Reuniones"],
-    "Jairo Perdomo": ["Trabajo autónomo", "Reuniones"],
-    "Laura Rodríguez": ["Trabajo autónomo", "Reuniones"],
-    "Luz Carolina Galvis": ["Trabajo autónomo", "Reuniones"],
-    "Maria Bernate": ["Trabajo autónomo", "Reuniones"],
-    "Martha Vargas": ["Trabajo autónomo", "Reuniones"],
-    }
-
-    # Guardar las actividades personalizadas en la sesión
-    st.session_state.actividades_personalizadas = actividades_personalizadas
-
-    # Generar datos iniciales
-    data = []
-    for fecha in dates:
-        for persona in personas:
-            # Para cada persona y fecha, generar datos para diferentes actividades
-            actividades_persona = actividades_personalizadas[persona]
-            for actividad in actividades_persona:
-                # Algunas actividades podrían no tener horas en ciertos días
-                if np.random.random() > 0.3:  # 70% de probabilidad de tener la actividad
-                    horas = round(np.random.uniform(1, 8), 1)  # Entre 1 y 8 horas, con un decimal
-                    proyecto = np.random.choice(proyectos)  # Asignar un proyecto aleatorio
-                    data.append({
-                        "fecha": fecha,
-                        "persona": persona,
-                        "actividad": actividad,
-                        "proyecto": proyecto,
-                        "horas": horas
-                    })
-
-    # Guardar los datos en un DataFrame y en la sesión
-    st.session_state.data = pd.DataFrame(data)
-
-    # Guardar la lista de proyectos en la sesión
-    st.session_state.proyectos = proyectos
-    
-    # Inicializar el estado de la contraseña
-    st.session_state.password_verified = False
-
+        st.session_state.proyectos = proyectos
+        st.session_state.password_verified = False
+    else:
+        st.error(f"El archivo CSV '{CSV_FILE}' no existe. Por favor crea o sube el archivo para continuar.")
+        st.stop()
 
 # Función para crear un link de descarga
 def get_download_link(df, filename, text):
@@ -469,8 +427,13 @@ if sidebar_tab == "Filtros":
 
     if len(selected_dates) == 2:
         start_date, end_date = selected_dates
-        filtered_df = st.session_state.data[(st.session_state.data['fecha'] >= start_date) &
-                                            (st.session_state.data['fecha'] <= end_date)]
+        start_date = pd.to_datetime(start_date)
+        end_date = pd.to_datetime(end_date)
+
+        filtered_df = st.session_state.data[
+            (st.session_state.data['fecha'] >= start_date) &
+            (st.session_state.data['fecha'] <= end_date)
+            ]
     else:
         filtered_df = st.session_state.data.copy()
 
@@ -544,7 +507,7 @@ elif sidebar_tab == "Generación de Reportes":
     # Verificar si la contraseña ya fue validada en esta sesión
     if 'password_verified' not in st.session_state:
         st.session_state.password_verified = False
-        
+
     if not st.session_state.password_verified:
         report_password = st.sidebar.text_input("Ingrese la contraseña para generar reportes", type="password")
         verify_button = st.sidebar.button("Verificar Contraseña")
@@ -672,6 +635,9 @@ if sidebar_tab == "Filtros":
         st.warning("No hay datos que mostrar con los filtros actuales.")
     else:
         col1, col2 = st.columns(2)
+        fecha_max = filtered_df['fecha'].max()
+        fecha_inicio_30 = fecha_max - pd.Timedelta(days=29)
+        ultimos_30_df = filtered_df[filtered_df['fecha'] >= fecha_inicio_30]
 
         # Métricas principales
         with col1:
@@ -690,26 +656,34 @@ if sidebar_tab == "Filtros":
         col1, col2 = st.columns(2)
 
         with col1:
-            # Gráfico de distribución de horas por actividad
-            actividad_data = filtered_df.groupby('actividad')['horas'].sum().reset_index()
+            # Filtrar solo los últimos 30 días desde hoy
+            fecha_max = filtered_df['fecha'].max()
+            fecha_inicio_30 = fecha_max - pd.Timedelta(days=29)
+
+            ultimos_30_df = filtered_df[filtered_df['fecha'] >= fecha_inicio_30]
+
+            # Agrupar por actividad solo en ese rango
+            actividad_data = ultimos_30_df.groupby('actividad')['horas'].sum().reset_index()
+
             fig_act = px.pie(
                 actividad_data,
                 values='horas',
                 names='actividad',
-                title='Distribución de Horas por Actividad',
+                title='Distribución de Horas por Actividad (Últimos 30 días)',
                 color_discrete_sequence=px.colors.qualitative.Set3
             )
+
             fig_act.update_traces(textposition='inside', textinfo='percent+label')
             st.plotly_chart(fig_act, use_container_width=True)
 
         with col2:
             # Gráfico de distribución de horas por persona
-            persona_data = filtered_df.groupby('persona')['horas'].sum().reset_index()
+            persona_data = ultimos_30_df.groupby('persona')['horas'].sum().reset_index()
             fig_per = px.bar(
                 persona_data,
                 x='persona',
                 y='horas',
-                title='Horas Totales por Persona',
+                title='Horas Totales por Persona (Últimos 30 días)',
                 color='persona',
                 color_discrete_sequence=px.colors.qualitative.Bold
             )
@@ -719,12 +693,12 @@ if sidebar_tab == "Filtros":
         st.markdown('<div class="section-header">Distribución por Proyectos</div>', unsafe_allow_html=True)
 
         # Gráfico de distribución de horas por proyecto
-        proyecto_data = filtered_df.groupby('proyecto')['horas'].sum().reset_index()
+        proyecto_data = ultimos_30_df.groupby('proyecto')['horas'].sum().reset_index()
         fig_proy = px.bar(
             proyecto_data,
             x='proyecto',
             y='horas',
-            title='Horas Totales por Proyecto',
+            title='Horas Totales por Proyecto (Últimos 30 días)',
             color='proyecto',
             color_discrete_sequence=px.colors.qualitative.Pastel
         )
@@ -819,14 +793,13 @@ elif sidebar_tab == "Generación de Reportes":
     </div>
     """, unsafe_allow_html=True)
 
-    st.markdown('<div class="section-header">Vista Previa del Formato de Reporte</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-header">Generar Reportes</div>', unsafe_allow_html=True)
 
     # Mostrar una imagen o descripción del formato del reporte
-    st.image("https://via.placeholder.com/800x400.png?text=Vista+Previa+del+Formato+de+Reporte",
-             caption="Ejemplo de formato de reporte PDF", use_container_width=True)
+    #st.image("https://via.placeholder.com/800x400.png?text=Vista+Previa+del+Formato+de+Reporte",
+     #        caption="Ejemplo de formato de reporte PDF", use_container_width=True)
 
-    st.info(
-        "Configura las opciones del reporte en la barra lateral y haz clic en 'Generar Reporte' para crear tu informe personalizado.")
+    st.info("Configura las opciones del reporte en la barra lateral y haz clic en 'Generar Reporte' para crear tu informe personalizado.")
 
 # Sección de registro de nueva actividad (visible en todas las pestañas excepto en la de generación de reportes)
 if sidebar_tab != "Generación de Reportes":
@@ -851,7 +824,7 @@ if sidebar_tab != "Generación de Reportes":
 
     with col3:
         # Cambiar el input de horas a un slider
-        nuevas_horas = st.slider("Horas dedicadas", min_value=0.5, max_value=12.0, value=4.0, step=0.5)
+        nuevas_horas = st.slider("Horas dedicadas", min_value=0.5, max_value=8.0, value=1.0, step=0.5)
 
         # Opción para añadir una nueva actividad en el momento
         nueva_actividad_checkbox = st.checkbox("¿Añadir nueva actividad?")
@@ -886,6 +859,7 @@ if sidebar_tab != "Generación de Reportes":
 
             # Actualizar DataFrame en session_state
             st.session_state.data = pd.concat([st.session_state.data, new_row], ignore_index=True)
+            st.session_state.data.to_csv(CSV_FILE, index=False)  # Guardar en CSV automáticamente
 
             # Mostrar mensaje de éxito
             st.success(
