@@ -91,6 +91,7 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
+# Inicialización del estado de sesión
 if 'authenticated' not in st.session_state:
     st.session_state.authenticated = False
 
@@ -152,7 +153,18 @@ def load_users():
                 return json.load(f)
         except json.JSONDecodeError:
             st.error("Error al cargar el archivo de usuarios. Creando uno nuevo.")
-            return {"admin": {"password": hash_password("admin123"), "role": "admin", "salt": ""}}
+            # Crear admin por defecto
+            admin_password = "admin123"
+            hashed_password = hash_password(admin_password)
+            users = {
+                "admin": {
+                    "password": base64.b64encode(hashed_password).decode('utf-8'),
+                    "role": "admin",
+                    "nombre_completo": "Administrador del Sistema"
+                }
+            }
+            save_users(users)
+            return users
     else:
         # Crear archivo de usuarios con un admin por defecto
         admin_password = "admin123"
@@ -249,7 +261,7 @@ def dias_laborables_entre_fechas(fecha_inicio, fecha_fin):
         fecha_actual += timedelta(days=1)
     return dias_laborables
 
-# Función modificada para generar un reporte en PDF
+# Función para generar un reporte en PDF
 def generate_pdf_report(df, report_title, start_date, end_date, selected_personas):
     class PDF(FPDF):
         def header(self):
@@ -257,7 +269,7 @@ def generate_pdf_report(df, report_title, start_date, end_date, selected_persona
             self.set_font('Arial', 'B', 15)
             self.cell(0, 10, "Reporte de Actividades", 0, 1, 'C')
             self.set_font('Arial', '', 10)
-            self.cell(0, 10, f"Periodo: {start_date} a {end_date}", 0, 1, 'C')
+            self.cell(0, 10, f"Periodo: {start_date.strftime('%Y-%m-%d')} a {end_date.strftime('%Y-%m-%d')}", 0, 1, 'C')
             self.ln(5)
 
         def footer(self):
@@ -579,7 +591,20 @@ if not st.session_state.authenticated:
 # Inicialización de datos en la sesión
 if 'data' not in st.session_state:
     if os.path.exists(CSV_FILE):
-        st.session_state.data = pd.read_csv(CSV_FILE, parse_dates=["fecha"])
+        # Cargar el CSV asegurando que las fechas se interpreten correctamente
+        st.session_state.data = pd.read_csv(CSV_FILE)
+        
+        # Convertir explícitamente la columna 'fecha' a datetime con formato flexible
+        try:
+            # Primero intentamos con formato ISO
+            st.session_state.data['fecha'] = pd.to_datetime(st.session_state.data['fecha'], format='ISO8601')
+        except ValueError:
+            try:
+                # Si falla, intentamos con formato personalizado
+                st.session_state.data['fecha'] = pd.to_datetime(st.session_state.data['fecha'], format='%Y-%m-%d')
+            except ValueError:
+                # Si todavía falla, usamos el modo 'mixed' muy flexible
+                st.session_state.data['fecha'] = pd.to_datetime(st.session_state.data['fecha'], format='mixed')
 
         # Obtener personas y proyectos del CSV
         personas = sorted(st.session_state.data['persona'].unique().tolist())
@@ -634,6 +659,9 @@ if st.session_state.user_role == "admin":
 
 sidebar_tab = st.sidebar.radio("", available_tabs)
 
+# Variable para almacenar el DataFrame filtrado
+filtered_df = pd.DataFrame()
+
 if sidebar_tab == "Filtros":
     st.sidebar.header("Filtros de Datos")
 
@@ -646,8 +674,20 @@ if sidebar_tab == "Filtros":
         available_personas = [st.session_state.username]
 
     # Filtro de fechas
-    min_date = st.session_state.data['fecha'].min() if not st.session_state.data.empty else datetime.now().date()
-    max_date = st.session_state.data['fecha'].max() if not st.session_state.data.empty else datetime.now().date()
+    if not st.session_state.data.empty:
+        # Asegurarnos de que las fechas estén en formato datetime
+        if pd.api.types.is_string_dtype(st.session_state.data['fecha']):
+            # Si las fechas son strings, convertirlas a datetime
+            min_date = pd.to_datetime(st.session_state.data['fecha'].min()).date()
+            max_date = pd.to_datetime(st.session_state.data['fecha'].max()).date()
+        else:
+            # Si ya son datetime, obtener el min y max
+            min_date = st.session_state.data['fecha'].min().date()
+            max_date = st.session_state.data['fecha'].max().date()
+    else:
+        min_date = datetime.now().date()
+        max_date = datetime.now().date()
+        
     selected_dates = st.sidebar.date_input(
         "Rango de fechas",
         value=(min_date, max_date),
@@ -657,6 +697,8 @@ if sidebar_tab == "Filtros":
 
     if len(selected_dates) == 2:
         start_date, end_date = selected_dates
+        
+        # Convertir las fechas al mismo formato que las fechas en el DataFrame
         start_date = pd.to_datetime(start_date)
         end_date = pd.to_datetime(end_date)
 
@@ -717,8 +759,20 @@ elif sidebar_tab == "Generación de Reportes":
             "Solo los administradores pueden generar reportes. Contacta con un administrador si necesitas acceso.")
     else:
         # Filtro de fechas para el reporte
-        min_date = st.session_state.data['fecha'].min() if not st.session_state.data.empty else datetime.now().date()
-        max_date = st.session_state.data['fecha'].max() if not st.session_state.data.empty else datetime.now().date()
+        if not st.session_state.data.empty:
+            # Asegurarnos de que las fechas estén en formato datetime
+            if pd.api.types.is_string_dtype(st.session_state.data['fecha']):
+                # Si las fechas son strings, convertirlas a datetime
+                min_date = pd.to_datetime(st.session_state.data['fecha'].min()).date()
+                max_date = pd.to_datetime(st.session_state.data['fecha'].max()).date()
+            else:
+                # Si ya son datetime, obtener el min y max
+                min_date = st.session_state.data['fecha'].min().date()
+                max_date = st.session_state.data['fecha'].max().date()
+        else:
+            min_date = datetime.now().date()
+            max_date = datetime.now().date()
+            
         report_dates = st.sidebar.date_input(
             "Rango de fechas para el reporte",
             value=(min_date, max_date),
@@ -771,6 +825,10 @@ elif sidebar_tab == "Generación de Reportes":
 
         if generate_button and len(report_dates) == 2 and report_personas:
             report_start_date, report_end_date = report_dates
+            
+            # Convertir las fechas al mismo formato que las fechas en el DataFrame
+            report_start_date = pd.to_datetime(report_start_date)
+            report_end_date = pd.to_datetime(report_end_date)
 
             # Filtrar datos para el reporte
             report_data = st.session_state.data[
@@ -983,258 +1041,258 @@ elif sidebar_tab == "Administración de Usuarios" and st.session_state.user_role
                         save_users(st.session_state.users)
                         st.sidebar.success(f"Usuario {user_to_delete} eliminado correctamente.")
 
-                        # Contenido principal basado en la pestaña seleccionada
-                        if sidebar_tab == "Filtros":
-                            # Evitar errores si no hay datos después de filtrar
-                            if filtered_df.empty:
-                                st.warning("No hay datos que mostrar con los filtros actuales.")
-                            else:
-                                col1, col2 = st.columns(2)
-                                fecha_max = filtered_df['fecha'].max()
-                                fecha_inicio_30 = fecha_max - pd.Timedelta(days=29)
-                                ultimos_30_df = filtered_df[filtered_df['fecha'] >= fecha_inicio_30]
+# Contenido principal basado en la pestaña seleccionada
+if sidebar_tab == "Filtros":
+    # Evitar errores si no hay datos después de filtrar
+    if filtered_df.empty:
+        st.warning("No hay datos que mostrar con los filtros actuales.")
+    else:
+        col1, col2 = st.columns(2)
+        fecha_max = filtered_df['fecha'].max()
+        fecha_inicio_30 = fecha_max - pd.Timedelta(days=29)
+        ultimos_30_df = filtered_df[filtered_df['fecha'] >= fecha_inicio_30]
 
-                                # Métricas principales
-                                with col1:
-                                    st.markdown('<div class="metric-container">', unsafe_allow_html=True)
-                                    st.metric("Total Horas Registradas", f"{filtered_df['horas'].sum():.1f}")
-                                    st.markdown('</div>', unsafe_allow_html=True)
+        # Métricas principales
+        with col1:
+            st.markdown('<div class="metric-container">', unsafe_allow_html=True)
+            st.metric("Total Horas Registradas", f"{filtered_df['horas'].sum():.1f}")
+            st.markdown('</div>', unsafe_allow_html=True)
 
-                                with col2:
-                                    st.markdown('<div class="metric-container">', unsafe_allow_html=True)
-                                    promedio_horas_diarias = filtered_df.groupby('fecha')['horas'].sum().mean()
-                                    st.metric("Promedio Horas Diarias", f"{promedio_horas_diarias:.1f}")
-                                    st.markdown('</div>', unsafe_allow_html=True)
+        with col2:
+            st.markdown('<div class="metric-container">', unsafe_allow_html=True)
+            promedio_horas_diarias = filtered_df.groupby('fecha')['horas'].sum().mean()
+            st.metric("Promedio Horas Diarias", f"{promedio_horas_diarias:.1f}")
+            st.markdown('</div>', unsafe_allow_html=True)
 
-                                # Sección 1: Distribución de Actividades
-                                st.markdown('<div class="section-header">Distribución de Actividades</div>',
-                                            unsafe_allow_html=True)
-                                col1, col2 = st.columns(2)
+        # Sección 1: Distribución de Actividades
+        st.markdown('<div class="section-header">Distribución de Actividades</div>',
+                    unsafe_allow_html=True)
+        col1, col2 = st.columns(2)
 
-                                with col1:
-                                    # Filtrar solo los últimos 30 días desde hoy
-                                    fecha_max = filtered_df['fecha'].max()
-                                    fecha_inicio_30 = fecha_max - pd.Timedelta(days=29)
+        with col1:
+            # Filtrar solo los últimos 30 días desde hoy
+            fecha_max = filtered_df['fecha'].max()
+            fecha_inicio_30 = fecha_max - pd.Timedelta(days=29)
 
-                                    ultimos_30_df = filtered_df[filtered_df['fecha'] >= fecha_inicio_30]
+            ultimos_30_df = filtered_df[filtered_df['fecha'] >= fecha_inicio_30]
 
-                                    # Agrupar por actividad solo en ese rango
-                                    actividad_data = ultimos_30_df.groupby('actividad')['horas'].sum().reset_index()
+            # Agrupar por actividad solo en ese rango
+            actividad_data = ultimos_30_df.groupby('actividad')['horas'].sum().reset_index()
 
-                                    fig_act = px.pie(
-                                        actividad_data,
-                                        values='horas',
-                                        names='actividad',
-                                        title='Distribución de Horas por Actividad (Últimos 30 días)',
-                                        color_discrete_sequence=px.colors.qualitative.Set3
-                                    )
+            fig_act = px.pie(
+                actividad_data,
+                values='horas',
+                names='actividad',
+                title='Distribución de Horas por Actividad (Últimos 30 días)',
+                color_discrete_sequence=px.colors.qualitative.Set3
+            )
 
-                                    fig_act.update_traces(textposition='inside', textinfo='percent+label')
-                                    st.plotly_chart(fig_act, use_container_width=True)
+            fig_act.update_traces(textposition='inside', textinfo='percent+label')
+            st.plotly_chart(fig_act, use_container_width=True)
 
-                                with col2:
-                                    # Gráfico de distribución de horas por persona
-                                    persona_data = ultimos_30_df.groupby('persona')['horas'].sum().reset_index()
-                                    fig_per = px.bar(
-                                        persona_data,
-                                        x='persona',
-                                        y='horas',
-                                        title='Horas Totales por Persona (Últimos 30 días)',
-                                        color='persona',
-                                        color_discrete_sequence=px.colors.qualitative.Bold
-                                    )
-                                    st.plotly_chart(fig_per, use_container_width=True)
+        with col2:
+            # Gráfico de distribución de horas por persona
+            persona_data = ultimos_30_df.groupby('persona')['horas'].sum().reset_index()
+            fig_per = px.bar(
+                persona_data,
+                x='persona',
+                y='horas',
+                title='Horas Totales por Persona (Últimos 30 días)',
+                color='persona',
+                color_discrete_sequence=px.colors.qualitative.Bold
+            )
+            st.plotly_chart(fig_per, use_container_width=True)
 
-                                # Sección de distribución por proyectos
-                                st.markdown('<div class="section-header">Distribución por Proyectos</div>',
-                                            unsafe_allow_html=True)
+        # Sección de distribución por proyectos
+        st.markdown('<div class="section-header">Distribución por Proyectos</div>',
+                    unsafe_allow_html=True)
 
-                                # Gráfico de distribución de horas por proyecto
-                                proyecto_data = ultimos_30_df.groupby('proyecto')['horas'].sum().reset_index()
-                                fig_proy = px.bar(
-                                    proyecto_data,
-                                    x='proyecto',
-                                    y='horas',
-                                    title='Horas Totales por Proyecto (Últimos 30 días)',
-                                    color='proyecto',
-                                    color_discrete_sequence=px.colors.qualitative.Pastel
-                                )
-                                st.plotly_chart(fig_proy, use_container_width=True)
+        # Gráfico de distribución de horas por proyecto
+        proyecto_data = ultimos_30_df.groupby('proyecto')['horas'].sum().reset_index()
+        fig_proy = px.bar(
+            proyecto_data,
+            x='proyecto',
+            y='horas',
+            title='Horas Totales por Proyecto (Últimos 30 días)',
+            color='proyecto',
+            color_discrete_sequence=px.colors.qualitative.Pastel
+        )
+        st.plotly_chart(fig_proy, use_container_width=True)
 
-                                # Matriz de proyectos y personas
-                                st.markdown('<div class="section-header">Matriz Proyectos-Personas</div>',
-                                            unsafe_allow_html=True)
+        # Matriz de proyectos y personas
+        st.markdown('<div class="section-header">Matriz Proyectos-Personas</div>',
+                    unsafe_allow_html=True)
 
-                                # Crear una tabla cruzada de proyectos por personas
-                                matriz_proy_pers = pd.pivot_table(
-                                    filtered_df,
-                                    values='horas',
-                                    index='proyecto',
-                                    columns='persona',
-                                    aggfunc='sum',
-                                    fill_value=0
-                                )
+        # Crear una tabla cruzada de proyectos por personas
+        matriz_proy_pers = pd.pivot_table(
+            filtered_df,
+            values='horas',
+            index='proyecto',
+            columns='persona',
+            aggfunc='sum',
+            fill_value=0
+        )
 
-                                # Mostrar como heatmap
-                                fig_matriz = px.imshow(
-                                    matriz_proy_pers,
-                                    text_auto='.1f',
-                                    color_continuous_scale='Blues',
-                                    title='Distribución de Horas por Proyecto y Persona'
-                                )
-                                fig_matriz.update_layout(height=400)
-                                st.plotly_chart(fig_matriz, use_container_width=True)
+        # Mostrar como heatmap
+        fig_matriz = px.imshow(
+            matriz_proy_pers,
+            text_auto='.1f',
+            color_continuous_scale='Blues',
+            title='Distribución de Horas por Proyecto y Persona'
+        )
+        fig_matriz.update_layout(height=400)
+        st.plotly_chart(fig_matriz, use_container_width=True)
 
-                                # Sección 2: Evolución Temporal
-                                st.markdown('<div class="section-header">Evolución Temporal de Actividades</div>',
-                                            unsafe_allow_html=True)
+        # Sección 2: Evolución Temporal
+        st.markdown('<div class="section-header">Evolución Temporal de Actividades</div>',
+                    unsafe_allow_html=True)
 
-                                # Gráfico de línea de horas diarias
-                                daily_hours = filtered_df.groupby(['fecha', 'persona'])['horas'].sum().reset_index()
-                                fig_evol = px.line(
-                                    daily_hours,
-                                    x='fecha',
-                                    y='horas',
-                                    color='persona',
-                                    title='Evolución de Horas Registradas por Día',
-                                    markers=True
-                                )
-                                st.plotly_chart(fig_evol, use_container_width=True)
+        # Gráfico de línea de horas diarias
+        daily_hours = filtered_df.groupby(['fecha', 'persona'])['horas'].sum().reset_index()
+        fig_evol = px.line(
+            daily_hours,
+            x='fecha',
+            y='horas',
+            color='persona',
+            title='Evolución de Horas Registradas por Día',
+            markers=True
+        )
+        st.plotly_chart(fig_evol, use_container_width=True)
 
-                                # Evolución por proyecto
-                                daily_hours_proyecto = filtered_df.groupby(['fecha', 'proyecto'])[
-                                    'horas'].sum().reset_index()
-                                fig_evol_proy = px.line(
-                                    daily_hours_proyecto,
-                                    x='fecha',
-                                    y='horas',
-                                    color='proyecto',
-                                    title='Evolución de Horas por Proyecto',
-                                    markers=True
-                                )
-                                st.plotly_chart(fig_evol_proy, use_container_width=True)
+        # Evolución por proyecto
+        daily_hours_proyecto = filtered_df.groupby(['fecha', 'proyecto'])[
+            'horas'].sum().reset_index()
+        fig_evol_proy = px.line(
+            daily_hours_proyecto,
+            x='fecha',
+            y='horas',
+            color='proyecto',
+            title='Evolución de Horas por Proyecto',
+            markers=True
+        )
+        st.plotly_chart(fig_evol_proy, use_container_width=True)
 
-                                # Sección 4: Tabla de Datos Detallados
-                                st.markdown('<div class="section-header">Datos Detallados</div>',
-                                            unsafe_allow_html=True)
+        # Sección 4: Tabla de Datos Detallados
+        st.markdown('<div class="section-header">Datos Detallados</div>',
+                    unsafe_allow_html=True)
 
-                                # Añadir un input para filtrar por texto
-                                search_term = st.text_input("Buscar en los datos:", "")
-                                if search_term:
-                                    search_results = filtered_df[
-                                        filtered_df['persona'].str.contains(search_term, case=False) |
-                                        filtered_df['actividad'].str.contains(search_term, case=False) |
-                                        filtered_df['proyecto'].str.contains(search_term, case=False)
-                                        ]
-                                    st.dataframe(search_results, use_container_width=True)
-                                else:
-                                    st.dataframe(filtered_df, use_container_width=True)
+        # Añadir un input para filtrar por texto
+        search_term = st.text_input("Buscar en los datos:", "")
+        if search_term:
+            search_results = filtered_df[
+                filtered_df['persona'].str.contains(search_term, case=False) |
+                filtered_df['actividad'].str.contains(search_term, case=False) |
+                filtered_df['proyecto'].str.contains(search_term, case=False)
+                ]
+            st.dataframe(search_results, use_container_width=True)
+        else:
+            st.dataframe(filtered_df, use_container_width=True)
 
-                        elif sidebar_tab == "Generación de Reportes":
-                            # Contenido principal para la pestaña de generación de reportes
-                            st.markdown('<div class="section-header">Generación de Reportes Personalizados</div>',
-                                        unsafe_allow_html=True)
+elif sidebar_tab == "Generación de Reportes":
+    # Contenido principal para la pestaña de generación de reportes
+    st.markdown('<div class="section-header">Generación de Reportes Personalizados</div>',
+                unsafe_allow_html=True)
 
-                            if st.session_state.user_role == "admin":
-                                st.markdown("""
-                                <div class="report-section">
-                                    <h3>Instrucciones para Generar Reportes</h3>
-                                    <p>Para generar un reporte personalizado, sigue estos pasos:</p>
-                                    <ol>
-                                        <li>En la barra lateral, selecciona el rango de fechas para el reporte.</li>
-                                        <li>Elige las personas que deseas incluir en el reporte.</li>
-                                        <li>Establece un título para tu reporte.</li>
-                                        <li>Haz clic en el botón "Generar Reporte".</li>
-                                        <li>Una vez generado, podrás descargar el reporte en formato PDF o los datos en CSV.</li>
-                                    </ol>
-                                    <p>Los reportes incluyen:</p>
-                                    <ul>
-                                        <li>Resumen general con total de horas y promedios.</li>
-                                        <li>Detalle por persona con horas por proyecto y actividad.</li>
-                                        <li>Listado completo de registros de actividades.</li>
-                                    </ul>
-                                </div>
-                                """, unsafe_allow_html=True)
+    if st.session_state.user_role == "admin":
+        st.markdown("""
+        <div class="report-section">
+            <h3>Instrucciones para Generar Reportes</h3>
+            <p>Para generar un reporte personalizado, sigue estos pasos:</p>
+            <ol>
+                <li>En la barra lateral, selecciona el rango de fechas para el reporte.</li>
+                <li>Elige las personas que deseas incluir en el reporte.</li>
+                <li>Establece un título para tu reporte.</li>
+                <li>Haz clic en el botón "Generar Reporte".</li>
+                <li>Una vez generado, podrás descargar el reporte en formato PDF o los datos en CSV.</li>
+            </ol>
+            <p>Los reportes incluyen:</p>
+            <ul>
+                <li>Resumen general con total de horas y promedios.</li>
+                <li>Detalle por persona con horas por proyecto y actividad.</li>
+                <li>Listado completo de registros de actividades.</li>
+            </ul>
+        </div>
+        """, unsafe_allow_html=True)
 
-                                st.markdown('<div class="section-header">Generar Reportes</div>',
-                                            unsafe_allow_html=True)
-                                st.info(
-                                    "Configura las opciones del reporte en la barra lateral y haz clic en 'Generar Reporte' para crear tu informe personalizado.")
-                            else:
-                                st.warning(
-                                    "Solo los administradores pueden generar reportes. Si necesitas un reporte de tus actividades, contacta con un administrador.")
+        st.markdown('<div class="section-header">Generar Reportes</div>',
+                    unsafe_allow_html=True)
+        st.info(
+            "Configura las opciones del reporte en la barra lateral y haz clic en 'Generar Reporte' para crear tu informe personalizado.")
+    else:
+        st.warning(
+            "Solo los administradores pueden generar reportes. Si necesitas un reporte de tus actividades, contacta con un administrador.")
 
-                        elif sidebar_tab == "Administración de Usuarios" and st.session_state.user_role == "admin":
-                            st.markdown('<div class="section-header">Administración de Usuarios</div>',
-                                        unsafe_allow_html=True)
+elif sidebar_tab == "Administración de Usuarios" and st.session_state.user_role == "admin":
+    st.markdown('<div class="section-header">Administración de Usuarios</div>',
+                unsafe_allow_html=True)
 
-                            st.markdown("""
-                            <div class="admin-section">
-                                <h3>Panel de Administración de Usuarios</h3>
-                                <p>En este panel puedes gestionar los usuarios del sistema:</p>
-                                <ul>
-                                    <li><strong>Ver Usuarios:</strong> Lista de todos los usuarios registrados en el sistema.</li>
-                                    <li><strong>Crear Usuario:</strong> Registra nuevos usuarios asignándoles un rol (administrador o usuario normal).</li>
-                                    <li><strong>Modificar Usuario:</strong> Actualiza la información de los usuarios existentes.</li>
-                                    <li><strong>Eliminar Usuario:</strong> Elimina usuarios del sistema (excepto tu propio usuario).</li>
-                                </ul>
-                                <p>Selecciona la acción que deseas realizar en el menú lateral.</p>
-                            </div>
-                            """, unsafe_allow_html=True)
+    st.markdown("""
+    <div class="admin-section">
+        <h3>Panel de Administración de Usuarios</h3>
+        <p>En este panel puedes gestionar los usuarios del sistema:</p>
+        <ul>
+            <li><strong>Ver Usuarios:</strong> Lista de todos los usuarios registrados en el sistema.</li>
+            <li><strong>Crear Usuario:</strong> Registra nuevos usuarios asignándoles un rol (administrador o usuario normal).</li>
+            <li><strong>Modificar Usuario:</strong> Actualiza la información de los usuarios existentes.</li>
+            <li><strong>Eliminar Usuario:</strong> Elimina usuarios del sistema (excepto tu propio usuario).</li>
+        </ul>
+        <p>Selecciona la acción que deseas realizar en el menú lateral.</p>
+    </div>
+    """, unsafe_allow_html=True)
 
-                            # Mostrar tabla de usuarios
-                            st.subheader("Lista de Usuarios")
+    # Mostrar tabla de usuarios
+    st.subheader("Lista de Usuarios")
 
-                            users_data = []
-                            for username, info in st.session_state.users.items():
-                                users_data.append({
-                                    "Usuario": username,
-                                    "Nombre Completo": info.get("nombre_completo", username),
-                                    "Rol": info.get("role", "user")
-                                })
+    users_data = []
+    for username, info in st.session_state.users.items():
+        users_data.append({
+            "Usuario": username,
+            "Nombre Completo": info.get("nombre_completo", username),
+            "Rol": info.get("role", "user")
+        })
 
-                            users_df = pd.DataFrame(users_data)
-                            st.dataframe(users_df, use_container_width=True)
+    users_df = pd.DataFrame(users_data)
+    st.dataframe(users_df, use_container_width=True)
 
-                        # Sección de registro de nueva actividad (visible en todas las pestañas excepto en la de generación de reportes)
-                        if sidebar_tab != "Generación de Reportes" and sidebar_tab != "Administración de Usuarios":
-                            st.markdown('<div class="section-header">Registrar Nueva Actividad</div>',
-                                        unsafe_allow_html=True)
+# Sección de registro de nueva actividad (visible en todas las pestañas excepto en la de generación de reportes)
+if sidebar_tab != "Generación de Reportes" and sidebar_tab != "Administración de Usuarios":
+    st.markdown('<div class="section-header">Registrar Nueva Actividad</div>',
+                unsafe_allow_html=True)
 
-                            col1, col2, col3 = st.columns(3)
+    col1, col2, col3 = st.columns(3)
 
-                            with col1:
-                                nueva_fecha = st.date_input("Fecha", datetime.now())
+    with col1:
+        nueva_fecha = st.date_input("Fecha", datetime.now())
 
-                                # Determinar la persona según el rol
-                                if st.session_state.user_role == "admin":
-                                    # Los administradores pueden registrar actividades para cualquier persona
-                                    personas_disponibles = sorted(
-                                        st.session_state.actividades_personalizadas.keys()) if st.session_state.actividades_personalizadas else [
-                                        st.session_state.username]
-                                    nueva_persona = st.selectbox("Persona", personas_disponibles,
-                                                                 index=personas_disponibles.index(
-                                                                     st.session_state.username) if st.session_state.username in personas_disponibles else 0)
-                                else:
-                                    # Los usuarios normales solo pueden registrar sus propias actividades
-                                    nueva_persona = st.session_state.username
-                                    st.write(f"Persona: {st.session_state.nombre_completo}")
+        # Determinar la persona según el rol
+        if st.session_state.user_role == "admin":
+            # Los administradores pueden registrar actividades para cualquier persona
+            personas_disponibles = sorted(
+                st.session_state.actividades_personalizadas.keys()) if st.session_state.actividades_personalizadas else [
+                st.session_state.username]
+            nueva_persona = st.selectbox("Persona", personas_disponibles,
+                                         index=personas_disponibles.index(
+                                             st.session_state.username) if st.session_state.username in personas_disponibles else 0)
+        else:
+            # Los usuarios normales solo pueden registrar sus propias actividades
+            nueva_persona = st.session_state.username
+            st.write(f"Persona: {st.session_state.nombre_completo}")
 
-                            with col2:
-                                # Las actividades se cargan dinámicamente según la persona seleccionada
-                                if nueva_persona not in st.session_state.actividades_personalizadas:
-                                    st.session_state.actividades_personalizadas[nueva_persona] = ["Trabajo autónomo",
-                                                                                                  "Reuniones"]
+    with col2:
+        # Las actividades se cargan dinámicamente según la persona seleccionada
+        if nueva_persona not in st.session_state.actividades_personalizadas:
+            st.session_state.actividades_personalizadas[nueva_persona] = ["Trabajo autónomo",
+                                                                          "Reuniones"]
 
-                                actividades_persona_seleccionada = st.session_state.actividades_personalizadas.get(
-                                    nueva_persona, [])
-                                if actividades_persona_seleccionada:
-                                    nueva_actividad = st.selectbox("Actividad", actividades_persona_seleccionada)
-                                else:
-                                    nueva_actividad = st.text_input("Actividad (no hay actividades predefinidas)")
+        actividades_persona_seleccionada = st.session_state.actividades_personalizadas.get(
+            nueva_persona, [])
+        if actividades_persona_seleccionada:
+            nueva_actividad = st.selectbox("Actividad", actividades_persona_seleccionada)
+        else:
+            nueva_actividad = st.text_input("Actividad (no hay actividades predefinidas)")
 
-                                # Selector de proyecto
-                                nuevo_proyecto = st.selectbox("Proyecto", st.session_state.proyectos)
+        # Selector de proyecto
+        nuevo_proyecto = st.selectbox("Proyecto", st.session_state.proyectos)
 
     with col3:
         # Cambiar el input de horas a un slider
