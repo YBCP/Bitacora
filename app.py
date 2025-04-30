@@ -12,8 +12,10 @@ import matplotlib.pyplot as plt
 from io import BytesIO
 import hashlib
 import os
+import time
 
 CSV_FILE = "registro_actividades.csv"
+USERS_FILE = "usuarios.json"
 
 # Configuración de la página
 st.set_page_config(
@@ -57,36 +59,118 @@ st.markdown("""
             padding: 15px;
             margin-bottom: 20px;
         }
+        .login-container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .login-header {
+            text-align: center;
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #1E88E5;
+            margin-bottom: 20px;
+        }
+        .admin-section {
+            background-color: #fff8e1;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            border-left: 4px solid #ffc107;
+        }
+        .user-info {
+            font-size: 0.9rem;
+            padding: 8px 12px;
+            background-color: #e3f2fd;
+            border-radius: 5px;
+            text-align: center;
+        }
     </style>
     """, unsafe_allow_html=True)
 
-# Inicializar la contraseña (en una aplicación real, usarías un método más seguro)
+if 'authenticated' not in st.session_state:
+    st.session_state.authenticated = False
+
+if 'username' not in st.session_state:
+    st.session_state.username = None
+
+if 'user_role' not in st.session_state:
+    st.session_state.user_role = None
+
+if 'nombre_completo' not in st.session_state:
+    st.session_state.nombre_completo = None
+
+# Inicializar la contraseña para reportes (en una aplicación real, usarías un método más seguro)
 REPORT_PASSWORD_HASH = hashlib.sha256("admin123".encode()).hexdigest()
 
+# Función para crear hash seguro de contraseña con salt
+def hash_password(password, salt=None):
+    if salt is None:
+        salt = os.urandom(32)  # 32 bytes de salt aleatorio
+    
+    # Combina la contraseña con el salt y genera el hash
+    key = hashlib.pbkdf2_hmac(
+        'sha256',
+        password.encode('utf-8'),
+        salt,
+        100000  # Número de iteraciones
+    )
+    
+    # Devuelve el salt y la llave concatenados para almacenamiento
+    return salt + key
+
 # Función para verificar la contraseña
-def verify_password(input_password):
+def verify_password(stored_password, provided_password):
+    # El salt es los primeros 32 bytes del hash almacenado
+    salt = stored_password[:32]
+    stored_key = stored_password[32:]
+    
+    # Calcula el hash para la contraseña proporcionada usando el mismo salt
+    key = hashlib.pbkdf2_hmac(
+        'sha256',
+        provided_password.encode('utf-8'),
+        salt,
+        100000  # Mismo número de iteraciones
+    )
+    
+    # Compara en tiempo constante para evitar ataques de timing
+    return key == stored_key
+
+# Función para verificar la contraseña de reportes
+def verify_report_password(input_password):
     input_hash = hashlib.sha256(input_password.encode()).hexdigest()
     return input_hash == REPORT_PASSWORD_HASH
 
-# Inicialización de datos en la sesión
-if 'data' not in st.session_state:
-    if os.path.exists(CSV_FILE):
-        st.session_state.data = pd.read_csv(CSV_FILE, parse_dates=["fecha"])
-
-        # Obtener personas y proyectos del CSV
-        personas = sorted(st.session_state.data['persona'].unique().tolist())
-        proyectos = sorted(st.session_state.data['proyecto'].unique().tolist())
-
-        # Asignar actividades por defecto (puedes ajustar esto según tus datos reales)
-        st.session_state.actividades_personalizadas = {
-            persona: ["Trabajo autónomo", "Reuniones"] for persona in personas
-        }
-
-        st.session_state.proyectos = proyectos
-        st.session_state.password_verified = False
+# Función para cargar usuarios o crear el archivo si no existe
+def load_users():
+    if os.path.exists(USERS_FILE):
+        try:
+            with open(USERS_FILE, 'r') as f:
+                return json.load(f)
+        except json.JSONDecodeError:
+            st.error("Error al cargar el archivo de usuarios. Creando uno nuevo.")
+            return {"admin": {"password": hash_password("admin123"), "role": "admin", "salt": ""}}
     else:
-        st.error(f"El archivo CSV '{CSV_FILE}' no existe. Por favor crea o sube el archivo para continuar.")
-        st.stop()
+        # Crear archivo de usuarios con un admin por defecto
+        admin_password = "admin123"
+        hashed_password = hash_password(admin_password)
+        users = {
+            "admin": {
+                "password": base64.b64encode(hashed_password).decode('utf-8'),
+                "role": "admin",
+                "nombre_completo": "Administrador del Sistema"
+            }
+        }
+        save_users(users)
+        return users
+
+# Función para guardar usuarios
+def save_users(users):
+    with open(USERS_FILE, 'w') as f:
+        json.dump(users, f)
 
 # Función para crear un link de descarga
 def get_download_link(df, filename, text):
@@ -95,13 +179,11 @@ def get_download_link(df, filename, text):
     href = f'<a href="data:file/csv;base64,{b64}" download="{filename}">{text}</a>'
     return href
 
-
 # Función para crear un link de descarga para PDF
 def get_pdf_download_link(pdf_bytes, filename, text):
     b64 = base64.b64encode(pdf_bytes).decode()
     href = f'<a href="data:application/pdf;base64,{b64}" download="{filename}">{text}</a>'
     return href
-
 
 # Función para identificar festivos en Colombia
 def es_festivo_colombia(fecha):
@@ -147,7 +229,6 @@ def es_festivo_colombia(fecha):
     ]
     return fecha in festivos
 
-
 # Función para determinar si un día es laboral (no es fin de semana ni festivo)
 def es_dia_laboral(fecha):
     # Verificar si no es sábado (5) ni domingo (6)
@@ -158,7 +239,6 @@ def es_dia_laboral(fecha):
         return False
     return True
 
-
 # Función para calcular días laborables entre dos fechas
 def dias_laborables_entre_fechas(fecha_inicio, fecha_fin):
     dias_laborables = 0
@@ -168,7 +248,6 @@ def dias_laborables_entre_fechas(fecha_inicio, fecha_fin):
             dias_laborables += 1
         fecha_actual += timedelta(days=1)
     return dias_laborables
-
 
 # Función modificada para generar un reporte en PDF
 def generate_pdf_report(df, report_title, start_date, end_date, selected_personas):
@@ -402,22 +481,173 @@ def generate_pdf_report(df, report_title, start_date, end_date, selected_persona
     pdf_bytes = pdf.output(dest='S').encode('latin1')
     return pdf_bytes
 
-# Título del dashboard
-st.markdown('<div class="main-header">Dashboard de Seguimiento de Actividades</div>', unsafe_allow_html=True)
+# Inicialización del estado de sesión de autenticación
+if 'authenticated' not in st.session_state:
+    st.session_state.authenticated = False
+    st.session_state.username = None
+    st.session_state.user_role = None
+    st.session_state.nombre_completo = None
+
+# Cargar usuarios al principio
+if 'users' not in st.session_state:
+    st.session_state.users = load_users()
+
+# Función para autenticar usuario
+def authenticate_user(username, password):
+    users = st.session_state.users
+    if username in users:
+        stored_password = base64.b64decode(users[username]["password"])
+        if verify_password(stored_password, password):
+            st.session_state.authenticated = True
+            st.session_state.username = username
+            st.session_state.user_role = users[username].get("role", "user")
+            st.session_state.nombre_completo = users[username].get("nombre_completo", username)
+            return True
+    return False
+
+# Función para cerrar sesión
+def logout():
+    st.session_state.authenticated = False
+    st.session_state.username = None
+    st.session_state.user_role = None
+    st.session_state.nombre_completo = None
+
+# Sistema de autenticación
+if not st.session_state.authenticated:
+    st.markdown('<div class="login-container">', unsafe_allow_html=True)
+    st.markdown('<div class="login-header">Acceso al Sistema</div>', unsafe_allow_html=True)
+    
+    login_tab, register_tab = st.tabs(["Iniciar Sesión", "Registrarse"])
+    
+    with login_tab:
+        username = st.text_input("Usuario", key="login_username")
+        password = st.text_input("Contraseña", type="password", key="login_password")
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("Iniciar Sesión", use_container_width=True):
+                if authenticate_user(username, password):
+                    st.success(f"¡Bienvenido {st.session_state.nombre_completo}!")
+                    time.sleep(1)  # Esperar un segundo para mostrar el mensaje
+                    st.rerun()
+                else:
+                    st.error("Usuario o contraseña incorrectos.")
+    
+    with register_tab:
+        # Solo permitir registro si hay un administrador que pueda verificar o si es la configuración inicial
+        if not st.session_state.users or any(user.get("role") == "admin" for user in st.session_state.users.values()):
+            new_username = st.text_input("Nuevo Usuario", key="reg_username")
+            new_password = st.text_input("Nueva Contraseña", type="password", key="reg_password")
+            confirm_password = st.text_input("Confirmar Contraseña", type="password", key="confirm_password")
+            nombre_completo = st.text_input("Nombre Completo", key="nombre_completo")
+            
+            # Si no hay usuarios, permitir crear un administrador
+            if not st.session_state.users:
+                is_admin = st.checkbox("Crear como administrador", value=True)
+            else:
+                is_admin = st.checkbox("Crear como administrador", value=False)
+            
+            if st.button("Registrarse", use_container_width=True):
+                if new_password != confirm_password:
+                    st.error("Las contraseñas no coinciden.")
+                elif new_username in st.session_state.users:
+                    st.error("El nombre de usuario ya existe.")
+                elif not new_username or not new_password:
+                    st.error("El usuario y la contraseña son obligatorios.")
+                else:
+                    # Hash de la nueva contraseña
+                    hashed_password = hash_password(new_password)
+                    
+                    # Agregar nuevo usuario
+                    st.session_state.users[new_username] = {
+                        "password": base64.b64encode(hashed_password).decode('utf-8'),
+                        "role": "admin" if is_admin else "user",
+                        "nombre_completo": nombre_completo if nombre_completo else new_username
+                    }
+                    
+                    # Guardar usuarios
+                    save_users(st.session_state.users)
+                    
+                    st.success(f"Usuario {new_username} registrado correctamente. Ahora puedes iniciar sesión.")
+        else:
+            st.info("El registro de nuevos usuarios está disponible solo para administradores. Por favor, contacte con un administrador.")
+    
+    st.markdown('</div>', unsafe_allow_html=True)
+    st.stop()  # Detener la ejecución si no hay autenticación
+
+# Si el usuario está autenticado, continuar con la aplicación
+# Inicialización de datos en la sesión
+if 'data' not in st.session_state:
+    if os.path.exists(CSV_FILE):
+        st.session_state.data = pd.read_csv(CSV_FILE, parse_dates=["fecha"])
+
+        # Obtener personas y proyectos del CSV
+        personas = sorted(st.session_state.data['persona'].unique().tolist())
+        proyectos = sorted(st.session_state.data['proyecto'].unique().tolist())
+
+        # Asignar actividades por defecto (puedes ajustar esto según tus datos reales)
+        st.session_state.actividades_personalizadas = {
+            persona: ["Trabajo autónomo", "Reuniones"] for persona in personas
+        }
+
+        st.session_state.proyectos = proyectos
+        st.session_state.password_verified = False
+    else:
+        # Crear un DataFrame vacío si no existe el archivo
+        st.session_state.data = pd.DataFrame(columns=["fecha", "persona", "actividad", "proyecto", "horas"])
+        st.session_state.actividades_personalizadas = {}
+        st.session_state.proyectos = ["Proyecto 1", "Proyecto 2", "Administrativo"]
+        st.session_state.password_verified = False
+        # Guardar el archivo vacío
+        st.session_state.data.to_csv(CSV_FILE, index=False)
+
+# Función para determinar si el usuario actual puede ver los datos de una persona
+def puede_ver_datos_persona(username, persona, user_role):
+    # Admin puede ver todo
+    if user_role == 'admin':
+        return True
+    # Usuario normal solo puede ver sus propios datos
+    return username == persona
+
+# Título del dashboard con info de usuario
+st.markdown('<div class="main-header">Dashboard de Seguimiento de Actividades Subdirección de Operaciones</div>', unsafe_allow_html=True)
+
+# Mostrar información del usuario y botón de cierre de sesión
+col1, col2, col3 = st.columns([6, 4, 2])
+with col1:
+    nombre_mostrar = st.session_state.nombre_completo if 'nombre_completo' in st.session_state and st.session_state.nombre_completo else "Usuario"
+    rol_mostrar = "Administrador" if 'user_role' in st.session_state and st.session_state.user_role == 'admin' else "Usuario"
+    st.markdown(f"<div class='user-info'>Usuario: {nombre_mostrar} | Rol: {rol_mostrar}</div>", unsafe_allow_html=True)
+
+with col3:
+    if st.button("Cerrar Sesión", use_container_width=True):
+        logout()
+        st.rerun()
 
 # Sidebar para filtros y configuración
 st.sidebar.title("Opciones")
 
 # Pestañas en la sidebar
-sidebar_tab = st.sidebar.radio("",
-                               ["Filtros", "Generación de Reportes", "Gestión de Actividades", "Gestión de Proyectos"])
+available_tabs = ["Filtros", "Generación de Reportes", "Gestión de Actividades", "Gestión de Proyectos"]
+if st.session_state.user_role == "admin":
+    available_tabs.append("Administración de Usuarios")
+
+sidebar_tab = st.sidebar.radio("", available_tabs)
 
 if sidebar_tab == "Filtros":
     st.sidebar.header("Filtros de Datos")
 
+    # Obtener lista de personas según el rol del usuario
+    all_personas = sorted(st.session_state.data['persona'].unique().tolist())
+    if st.session_state.user_role == "admin":
+        available_personas = all_personas
+    else:
+        # Usuario normal solo puede ver sus propios datos
+        available_personas = [st.session_state.username]
+
     # Filtro de fechas
-    min_date = st.session_state.data['fecha'].min()
-    max_date = st.session_state.data['fecha'].max()
+    min_date = st.session_state.data['fecha'].min() if not st.session_state.data.empty else datetime.now().date()
+    max_date = st.session_state.data['fecha'].max() if not st.session_state.data.empty else datetime.now().date()
     selected_dates = st.sidebar.date_input(
         "Rango de fechas",
         value=(min_date, max_date),
@@ -437,19 +667,19 @@ if sidebar_tab == "Filtros":
     else:
         filtered_df = st.session_state.data.copy()
 
-    # Filtro de personas
-    all_personas = sorted(st.session_state.data['persona'].unique().tolist())
+    # Filtro de personas (según permisos)
     selected_personas = st.sidebar.multiselect(
         "Personas",
-        all_personas,
-        default=all_personas
+        available_personas,
+        default=available_personas
     )
 
     if selected_personas:
         filtered_df = filtered_df[filtered_df['persona'].isin(selected_personas)]
 
     # Filtro de proyectos
-    all_proyectos = sorted(st.session_state.data['proyecto'].unique().tolist())
+    all_proyectos = sorted(
+        st.session_state.data['proyecto'].unique().tolist()) if not st.session_state.data.empty else []
     selected_proyectos = st.sidebar.multiselect(
         "Proyectos",
         all_proyectos,
@@ -460,7 +690,7 @@ if sidebar_tab == "Filtros":
         filtered_df = filtered_df[filtered_df['proyecto'].isin(selected_proyectos)]
 
     # Filtro dinámico de actividades basado en las personas seleccionadas
-    if selected_personas:
+    if selected_personas and not filtered_df.empty:
         # Recopilar todas las actividades de las personas seleccionadas
         actividades_disponibles = filtered_df['actividad'].unique().tolist()
         selected_actividades = st.sidebar.multiselect(
@@ -479,348 +709,532 @@ if sidebar_tab == "Filtros":
 elif sidebar_tab == "Generación de Reportes":
     st.sidebar.header("Configuración del Reporte")
 
-    # Filtro de fechas para el reporte
-    min_date = st.session_state.data['fecha'].min()
-    max_date = st.session_state.data['fecha'].max()
-    report_dates = st.sidebar.date_input(
-        "Rango de fechas para el reporte",
-        value=(min_date, max_date),
-        min_value=min_date,
-        max_value=max_date
-    )
+    # Determinar si el usuario tiene permisos para generar reportes
+    can_generate_reports = (st.session_state.user_role == "admin")
 
-    # Filtro de personas para el reporte
-    all_personas = sorted(st.session_state.data['persona'].unique().tolist())
-    report_personas = st.sidebar.multiselect(
-        "Personas a incluir en el reporte",
-        all_personas,
-        default=all_personas
-    )
-
-    # Título del reporte
-    report_title = st.sidebar.text_input("Título del reporte", "Reporte de Actividades")
-    
-    # Sección de verificación de contraseña
-    st.sidebar.markdown('<div class="password-container">', unsafe_allow_html=True)
-    st.sidebar.subheader("Verificación de Seguridad")
-    
-    # Verificar si la contraseña ya fue validada en esta sesión
-    if 'password_verified' not in st.session_state:
-        st.session_state.password_verified = False
-
-    if not st.session_state.password_verified:
-        report_password = st.sidebar.text_input("Ingrese la contraseña para generar reportes", type="password")
-        verify_button = st.sidebar.button("Verificar Contraseña")
-        
-        if verify_button:
-            if verify_password(report_password):
-                st.session_state.password_verified = True
-                st.sidebar.success("¡Contraseña correcta! Ahora puedes generar reportes.")
-            else:
-                st.sidebar.error("Contraseña incorrecta. Inténtalo de nuevo.")
+    if not can_generate_reports:
+        st.sidebar.warning(
+            "Solo los administradores pueden generar reportes. Contacta con un administrador si necesitas acceso.")
     else:
-        st.sidebar.success("Contraseña verificada. Puedes generar reportes.")
-        
-        # Botón para cerrar sesión
-        if st.sidebar.button("Cerrar Sesión"):
+        # Filtro de fechas para el reporte
+        min_date = st.session_state.data['fecha'].min() if not st.session_state.data.empty else datetime.now().date()
+        max_date = st.session_state.data['fecha'].max() if not st.session_state.data.empty else datetime.now().date()
+        report_dates = st.sidebar.date_input(
+            "Rango de fechas para el reporte",
+            value=(min_date, max_date),
+            min_value=min_date,
+            max_value=max_date
+        )
+
+        # Filtro de personas para el reporte (según permisos)
+        all_personas = sorted(
+            st.session_state.data['persona'].unique().tolist()) if not st.session_state.data.empty else []
+        report_personas = st.sidebar.multiselect(
+            "Personas a incluir en el reporte",
+            all_personas,
+            default=all_personas
+        )
+
+        # Título del reporte
+        report_title = st.sidebar.text_input("Título del reporte", "Reporte de Actividades")
+
+        # Sección de verificación de contraseña
+        st.sidebar.markdown('<div class="password-container">', unsafe_allow_html=True)
+        st.sidebar.subheader("Verificación de Seguridad")
+
+        # Verificar si la contraseña ya fue validada en esta sesión
+        if 'password_verified' not in st.session_state:
             st.session_state.password_verified = False
-            st.experimental_rerun()
-            
-    st.sidebar.markdown('</div>', unsafe_allow_html=True)
 
-    # Botón para generar el reporte (solo habilitado si la contraseña fue verificada)
-    generate_button = st.sidebar.button("Generar Reporte", disabled=not st.session_state.password_verified)
-    
-    if generate_button and len(report_dates) == 2 and report_personas:
-        report_start_date, report_end_date = report_dates
+        if not st.session_state.password_verified:
+            report_password = st.sidebar.text_input("Ingrese la contraseña para generar reportes", type="password")
+            verify_button = st.sidebar.button("Verificar Contraseña")
 
-        # Filtrar datos para el reporte
-        report_data = st.session_state.data[
-            (st.session_state.data['fecha'] >= report_start_date) &
-            (st.session_state.data['fecha'] <= report_end_date) &
-            (st.session_state.data['persona'].isin(report_personas))
-            ]
-
-        if report_data.empty:
-            st.sidebar.error("No hay datos disponibles para el reporte con los filtros seleccionados.")
+            if verify_button:
+                if verify_report_password(report_password):
+                    st.session_state.password_verified = True
+                    st.sidebar.success("¡Contraseña correcta! Ahora puedes generar reportes.")
+                else:
+                    st.sidebar.error("Contraseña incorrecta. Inténtalo de nuevo.")
         else:
-            # Generar PDF
-            pdf_bytes = generate_pdf_report(report_data, report_title, report_start_date, report_end_date,
-                                            report_personas)
+            st.sidebar.success("Contraseña verificada. Puedes generar reportes.")
 
-            # Crear link de descarga para el PDF
-            report_filename = f"reporte_{report_start_date}_a_{report_end_date}.pdf"
-            st.sidebar.markdown(get_pdf_download_link(pdf_bytes, report_filename,
-                                                      "📥 Descargar Reporte PDF"), unsafe_allow_html=True)
+            # Botón para cerrar sesión
+            if st.sidebar.button("Reiniciar Verificación"):
+                st.session_state.password_verified = False
+                st.rerun()
 
-            # También ofrecer la opción de descarga en CSV
-            st.sidebar.markdown(get_download_link(report_data,
-                                                  f"datos_reporte_{report_start_date}_a_{report_end_date}.csv",
-                                                  "📥 Descargar Datos del Reporte (CSV)"), unsafe_allow_html=True)
+        st.sidebar.markdown('</div>', unsafe_allow_html=True)
 
-            # Mostrar una vista previa
-            st.sidebar.success(f"Reporte generado con {len(report_data)} registros")
+        # Botón para generar el reporte (solo habilitado si la contraseña fue verificada)
+        generate_button = st.sidebar.button("Generar Reporte", disabled=not st.session_state.password_verified)
+
+        if generate_button and len(report_dates) == 2 and report_personas:
+            report_start_date, report_end_date = report_dates
+
+            # Filtrar datos para el reporte
+            report_data = st.session_state.data[
+                (st.session_state.data['fecha'] >= report_start_date) &
+                (st.session_state.data['fecha'] <= report_end_date) &
+                (st.session_state.data['persona'].isin(report_personas))
+                ]
+
+            if report_data.empty:
+                st.sidebar.error("No hay datos disponibles para el reporte con los filtros seleccionados.")
+            else:
+                # Generar PDF
+                pdf_bytes = generate_pdf_report(report_data, report_title, report_start_date, report_end_date,
+                                                report_personas)
+
+                # Crear link de descarga para el PDF
+                report_filename = f"reporte_{report_start_date}_a_{report_end_date}.pdf"
+                st.sidebar.markdown(get_pdf_download_link(pdf_bytes, report_filename,
+                                                          "📥 Descargar Reporte PDF"), unsafe_allow_html=True)
+
+                # También ofrecer la opción de descarga en CSV
+                st.sidebar.markdown(get_download_link(report_data,
+                                                      f"datos_reporte_{report_start_date}_a_{report_end_date}.csv",
+                                                      "📥 Descargar Datos del Reporte (CSV)"), unsafe_allow_html=True)
+
+                # Mostrar una vista previa
+                st.sidebar.success(f"Reporte generado con {len(report_data)} registros")
+
 elif sidebar_tab == "Gestión de Actividades":
     st.sidebar.header("Personalizar Actividades")
 
-    # Selector de persona para editar sus actividades
-    persona_elegida = st.sidebar.selectbox(
-        "Selecciona una persona para editar sus actividades:",
-        sorted(st.session_state.actividades_personalizadas.keys())
-    )
+    # Selector de persona para editar sus actividades (según permisos)
+    if st.session_state.user_role == "admin":
+        available_personas = sorted(
+            st.session_state.actividades_personalizadas.keys()) if st.session_state.actividades_personalizadas else []
+    else:
+        # Usuario normal solo puede editar sus propias actividades
+        if st.session_state.username not in st.session_state.actividades_personalizadas:
+            st.session_state.actividades_personalizadas[st.session_state.username] = ["Trabajo autónomo", "Reuniones"]
+        available_personas = [st.session_state.username]
 
-    # Mostrar las actividades actuales de la persona seleccionada
-    st.sidebar.subheader(f"Actividades de {persona_elegida}")
+    if not available_personas:
+        st.sidebar.warning("No hay personas disponibles para editar actividades.")
+    else:
+        persona_elegida = st.sidebar.selectbox(
+            "Selecciona una persona para editar sus actividades:",
+            available_personas
+        )
 
-    # Convertir la lista de actividades a un string para edición
-    actividades_actuales = st.session_state.actividades_personalizadas[persona_elegida]
-    actividades_texto = "\n".join(actividades_actuales)
+        # Mostrar las actividades actuales de la persona seleccionada
+        st.sidebar.subheader(f"Actividades de {persona_elegida}")
 
-    # Área de texto para editar actividades
-    nuevas_actividades_texto = st.sidebar.text_area(
-        "Edita las actividades (una por línea):",
-        value=actividades_texto,
-        height=200
-    )
+        # Verificar si la persona tiene actividades asignadas
+        if persona_elegida not in st.session_state.actividades_personalizadas:
+            st.session_state.actividades_personalizadas[persona_elegida] = ["Trabajo autónomo", "Reuniones"]
 
-    # Botón para guardar cambios
-    if st.sidebar.button("Guardar Cambios"):
-        # Convertir el texto a una lista de actividades
-        nuevas_actividades = [act.strip() for act in nuevas_actividades_texto.split("\n") if act.strip()]
+        # Convertir la lista de actividades a un string para edición
+        actividades_actuales = st.session_state.actividades_personalizadas[persona_elegida]
+        actividades_texto = "\n".join(actividades_actuales)
 
-        # Actualizar las actividades en el diccionario
-        st.session_state.actividades_personalizadas[persona_elegida] = nuevas_actividades
+        # Área de texto para editar actividades
+        nuevas_actividades_texto = st.sidebar.text_area(
+            "Edita las actividades (una por línea):",
+            value=actividades_texto,
+            height=200
+        )
 
-        # Mostrar mensaje de éxito
-        st.sidebar.success(f"Actividades actualizadas para {persona_elegida}")
+        # Botón para guardar cambios
+        if st.sidebar.button("Guardar Cambios"):
+            # Convertir el texto a una lista de actividades
+            nuevas_actividades = [act.strip() for act in nuevas_actividades_texto.split("\n") if act.strip()]
 
-        # Nota sobre los datos históricos
-        st.sidebar.info("Nota: Los cambios no afectan a los datos históricos ya registrados.")
+            # Actualizar las actividades en el diccionario
+            st.session_state.actividades_personalizadas[persona_elegida] = nuevas_actividades
+
+            # Mostrar mensaje de éxito
+            st.sidebar.success(f"Actividades actualizadas para {persona_elegida}")
+
+            # Nota sobre los datos históricos
+            st.sidebar.info("Nota: Los cambios no afectan a los datos históricos ya registrados.")
 
 elif sidebar_tab == "Gestión de Proyectos":
     st.sidebar.header("Gestionar Proyectos")
 
-    # Mostrar los proyectos actuales
-    st.sidebar.subheader("Proyectos Actuales")
-
-    # Convertir la lista de proyectos a un string para edición
-    proyectos_actuales = st.session_state.proyectos
-    proyectos_texto = "\n".join(proyectos_actuales)
-
-    # Área de texto para editar proyectos
-    nuevos_proyectos_texto = st.sidebar.text_area(
-        "Edita los proyectos (uno por línea):",
-        value=proyectos_texto,
-        height=200
-    )
-
-    # Botón para guardar cambios
-    if st.sidebar.button("Guardar Cambios"):
-        # Convertir el texto a una lista de proyectos
-        nuevos_proyectos = [proy.strip() for proy in nuevos_proyectos_texto.split("\n") if proy.strip()]
-
-        # Actualizar la lista de proyectos en la sesión
-        st.session_state.proyectos = nuevos_proyectos
-
-        # Mostrar mensaje de éxito
-        st.sidebar.success("Lista de proyectos actualizada")
-
-        # Nota sobre los datos históricos
-        st.sidebar.info("Nota: Los cambios no afectan a los datos históricos ya registrados.")
-
-# Contenido principal basado en la pestaña seleccionada
-if sidebar_tab == "Filtros":
-    # Evitar errores si no hay datos después de filtrar
-    if filtered_df.empty:
-        st.warning("No hay datos que mostrar con los filtros actuales.")
+    # Solo permitir gestión de proyectos a los administradores
+    if st.session_state.user_role != "admin":
+        st.sidebar.warning("Solo los administradores pueden gestionar proyectos.")
     else:
-        col1, col2 = st.columns(2)
-        fecha_max = filtered_df['fecha'].max()
-        fecha_inicio_30 = fecha_max - pd.Timedelta(days=29)
-        ultimos_30_df = filtered_df[filtered_df['fecha'] >= fecha_inicio_30]
+        # Mostrar los proyectos actuales
+        st.sidebar.subheader("Proyectos Actuales")
 
-        # Métricas principales
-        with col1:
-            st.markdown('<div class="metric-container">', unsafe_allow_html=True)
-            st.metric("Total Horas Registradas", f"{filtered_df['horas'].sum():.1f}")
-            st.markdown('</div>', unsafe_allow_html=True)
+        # Convertir la lista de proyectos a un string para edición
+        proyectos_actuales = st.session_state.proyectos
+        proyectos_texto = "\n".join(proyectos_actuales)
 
-        with col2:
-            st.markdown('<div class="metric-container">', unsafe_allow_html=True)
-            promedio_horas_diarias = filtered_df.groupby('fecha')['horas'].sum().mean()
-            st.metric("Promedio Horas Diarias", f"{promedio_horas_diarias:.1f}")
-            st.markdown('</div>', unsafe_allow_html=True)
-
-        # Sección 1: Distribución de Actividades
-        st.markdown('<div class="section-header">Distribución de Actividades</div>', unsafe_allow_html=True)
-        col1, col2 = st.columns(2)
-
-        with col1:
-            # Filtrar solo los últimos 30 días desde hoy
-            fecha_max = filtered_df['fecha'].max()
-            fecha_inicio_30 = fecha_max - pd.Timedelta(days=29)
-
-            ultimos_30_df = filtered_df[filtered_df['fecha'] >= fecha_inicio_30]
-
-            # Agrupar por actividad solo en ese rango
-            actividad_data = ultimos_30_df.groupby('actividad')['horas'].sum().reset_index()
-
-            fig_act = px.pie(
-                actividad_data,
-                values='horas',
-                names='actividad',
-                title='Distribución de Horas por Actividad (Últimos 30 días)',
-                color_discrete_sequence=px.colors.qualitative.Set3
-            )
-
-            fig_act.update_traces(textposition='inside', textinfo='percent+label')
-            st.plotly_chart(fig_act, use_container_width=True)
-
-        with col2:
-            # Gráfico de distribución de horas por persona
-            persona_data = ultimos_30_df.groupby('persona')['horas'].sum().reset_index()
-            fig_per = px.bar(
-                persona_data,
-                x='persona',
-                y='horas',
-                title='Horas Totales por Persona (Últimos 30 días)',
-                color='persona',
-                color_discrete_sequence=px.colors.qualitative.Bold
-            )
-            st.plotly_chart(fig_per, use_container_width=True)
-
-        # Sección de distribución por proyectos
-        st.markdown('<div class="section-header">Distribución por Proyectos</div>', unsafe_allow_html=True)
-
-        # Gráfico de distribución de horas por proyecto
-        proyecto_data = ultimos_30_df.groupby('proyecto')['horas'].sum().reset_index()
-        fig_proy = px.bar(
-            proyecto_data,
-            x='proyecto',
-            y='horas',
-            title='Horas Totales por Proyecto (Últimos 30 días)',
-            color='proyecto',
-            color_discrete_sequence=px.colors.qualitative.Pastel
-        )
-        st.plotly_chart(fig_proy, use_container_width=True)
-
-        # Matriz de proyectos y personas
-        st.markdown('<div class="section-header">Matriz Proyectos-Personas</div>', unsafe_allow_html=True)
-
-        # Crear una tabla cruzada de proyectos por personas
-        matriz_proy_pers = pd.pivot_table(
-            filtered_df,
-            values='horas',
-            index='proyecto',
-            columns='persona',
-            aggfunc='sum',
-            fill_value=0
+        # Área de texto para editar proyectos
+        nuevos_proyectos_texto = st.sidebar.text_area(
+            "Edita los proyectos (uno por línea):",
+            value=proyectos_texto,
+            height=200
         )
 
-        # Mostrar como heatmap
-        fig_matriz = px.imshow(
-            matriz_proy_pers,
-            text_auto='.1f',
-            color_continuous_scale='Blues',
-            title='Distribución de Horas por Proyecto y Persona'
-        )
-        fig_matriz.update_layout(height=400)
-        st.plotly_chart(fig_matriz, use_container_width=True)
+        # Botón para guardar cambios
+        if st.sidebar.button("Guardar Cambios"):
+            # Convertir el texto a una lista de proyectos
+            nuevos_proyectos = [proy.strip() for proy in nuevos_proyectos_texto.split("\n") if proy.strip()]
 
-        # Sección 2: Evolución Temporal
-        st.markdown('<div class="section-header">Evolución Temporal de Actividades</div>', unsafe_allow_html=True)
+            # Actualizar la lista de proyectos en la sesión
+            st.session_state.proyectos = nuevos_proyectos
 
-        # Gráfico de línea de horas diarias
-        daily_hours = filtered_df.groupby(['fecha', 'persona'])['horas'].sum().reset_index()
-        fig_evol = px.line(
-            daily_hours,
-            x='fecha',
-            y='horas',
-            color='persona',
-            title='Evolución de Horas Registradas por Día',
-            markers=True
-        )
-        st.plotly_chart(fig_evol, use_container_width=True)
+            # Mostrar mensaje de éxito
+            st.sidebar.success("Lista de proyectos actualizada")
 
-        # Evolución por proyecto
-        daily_hours_proyecto = filtered_df.groupby(['fecha', 'proyecto'])['horas'].sum().reset_index()
-        fig_evol_proy = px.line(
-            daily_hours_proyecto,
-            x='fecha',
-            y='horas',
-            color='proyecto',
-            title='Evolución de Horas por Proyecto',
-            markers=True
-        )
-        st.plotly_chart(fig_evol_proy, use_container_width=True)
+            # Nota sobre los datos históricos
+            st.sidebar.info("Nota: Los cambios no afectan a los datos históricos ya registrados.")
 
-        # Sección 4: Tabla de Datos Detallados
-        st.markdown('<div class="section-header">Datos Detallados</div>', unsafe_allow_html=True)
+elif sidebar_tab == "Administración de Usuarios" and st.session_state.user_role == "admin":
+    st.sidebar.header("Administración de Usuarios")
 
-        # Añadir un input para filtrar por texto
-        search_term = st.text_input("Buscar en los datos:", "")
-        if search_term:
-            search_results = filtered_df[
-                filtered_df['persona'].str.contains(search_term, case=False) |
-                filtered_df['actividad'].str.contains(search_term, case=False) |
-                filtered_df['proyecto'].str.contains(search_term, case=False)
-                ]
-            st.dataframe(search_results, use_container_width=True)
-        else:
-            st.dataframe(filtered_df, use_container_width=True)
+    admin_action = st.sidebar.radio("Acción:",
+                                    ["Ver Usuarios", "Crear Usuario", "Modificar Usuario", "Eliminar Usuario"])
 
-elif sidebar_tab == "Generación de Reportes":
-    # Contenido principal para la pestaña de generación de reportes
-    st.markdown('<div class="section-header">Generación de Reportes Personalizados</div>', unsafe_allow_html=True)
+    if admin_action == "Ver Usuarios":
+        st.sidebar.subheader("Usuarios del Sistema")
+        for username, user_info in st.session_state.users.items():
+            st.sidebar.markdown(f"""
+            **Usuario:** {username}  
+            **Nombre:** {user_info.get('nombre_completo', username)}  
+            **Rol:** {user_info.get('role', 'user')}
+            ---
+            """)
 
-    st.markdown("""
-    <div class="report-section">
-        <h3>Instrucciones para Generar Reportes</h3>
-        <p>Para generar un reporte personalizado, sigue estos pasos:</p>
-        <ol>
-            <li>En la barra lateral, selecciona el rango de fechas para el reporte.</li>
-            <li>Elige las personas que deseas incluir en el reporte.</li>
-            <li>Establece un título para tu reporte.</li>
-            <li>Haz clic en el botón "Generar Reporte".</li>
-            <li>Una vez generado, podrás descargar el reporte en formato PDF o los datos en CSV.</li>
-        </ol>
-        <p>Los reportes incluyen:</p>
-        <ul>
-            <li>Resumen general con total de horas y promedios.</li>
-            <li>Detalle por persona con horas por proyecto y actividad.</li>
-            <li>Listado completo de registros de actividades.</li>
-        </ul>
-    </div>
-    """, unsafe_allow_html=True)
+    elif admin_action == "Crear Usuario":
+        st.sidebar.subheader("Crear Nuevo Usuario")
+        new_username = st.sidebar.text_input("Nombre de Usuario")
+        new_password = st.sidebar.text_input("Contraseña", type="password")
+        confirm_password = st.sidebar.text_input("Confirmar Contraseña", type="password")
+        new_nombre = st.sidebar.text_input("Nombre Completo")
+        new_role = st.sidebar.selectbox("Rol", ["user", "admin"])
 
-    st.markdown('<div class="section-header">Generar Reportes</div>', unsafe_allow_html=True)
+        if st.sidebar.button("Crear Usuario"):
+            if not new_username or not new_password:
+                st.sidebar.error("Usuario y contraseña son obligatorios.")
+            elif new_password != confirm_password:
+                st.sidebar.error("Las contraseñas no coinciden.")
+            elif new_username in st.session_state.users:
+                st.sidebar.error("El nombre de usuario ya existe.")
+            else:
+                # Hash la contraseña
+                hashed_password = hash_password(new_password)
 
-    # Mostrar una imagen o descripción del formato del reporte
-    #st.image("https://via.placeholder.com/800x400.png?text=Vista+Previa+del+Formato+de+Reporte",
-     #        caption="Ejemplo de formato de reporte PDF", use_container_width=True)
+                # Agregar usuario
+                st.session_state.users[new_username] = {
+                    "password": base64.b64encode(hashed_password).decode('utf-8'),
+                    "role": new_role,
+                    "nombre_completo": new_nombre if new_nombre else new_username
+                }
 
-    st.info("Configura las opciones del reporte en la barra lateral y haz clic en 'Generar Reporte' para crear tu informe personalizado.")
+                # Guardar cambios
+                save_users(st.session_state.users)
+                st.sidebar.success(f"Usuario {new_username} creado correctamente.")
 
-# Sección de registro de nueva actividad (visible en todas las pestañas excepto en la de generación de reportes)
-if sidebar_tab != "Generación de Reportes":
-    st.markdown('<div class="section-header">Registrar Nueva Actividad</div>', unsafe_allow_html=True)
+    elif admin_action == "Modificar Usuario":
+        st.sidebar.subheader("Modificar Usuario")
+        user_to_modify = st.sidebar.selectbox("Seleccionar Usuario", list(st.session_state.users.keys()))
 
-    col1, col2, col3 = st.columns(3)
+        if user_to_modify:
+            user_info = st.session_state.users[user_to_modify]
+            new_nombre = st.sidebar.text_input("Nombre Completo",
+                                               value=user_info.get("nombre_completo", user_to_modify))
+            new_role = st.sidebar.selectbox("Rol", ["user", "admin"], index=0 if user_info.get("role") == "user" else 1)
+            change_password = st.sidebar.checkbox("Cambiar Contraseña")
 
-    with col1:
-        nueva_fecha = st.date_input("Fecha", datetime.now())
-        nueva_persona = st.selectbox("Persona", sorted(st.session_state.actividades_personalizadas.keys()))
+            if change_password:
+                new_password = st.sidebar.text_input("Nueva Contraseña", type="password")
+                confirm_password = st.sidebar.text_input("Confirmar Nueva Contraseña", type="password")
 
-    with col2:
-        # Las actividades se cargan dinámicamente según la persona seleccionada
-        actividades_persona_seleccionada = st.session_state.actividades_personalizadas.get(nueva_persona, [])
-        if actividades_persona_seleccionada:
-            nueva_actividad = st.selectbox("Actividad", actividades_persona_seleccionada)
-        else:
-            nueva_actividad = st.text_input("Actividad (no hay actividades predefinidas)")
+            if st.sidebar.button("Guardar Cambios"):
+                if change_password:
+                    if not new_password:
+                        st.sidebar.error("La contraseña no puede estar vacía.")
+                    elif new_password != confirm_password:
+                        st.sidebar.error("Las contraseñas no coinciden.")
+                    else:
+                        # Actualizar contraseña
+                        hashed_password = hash_password(new_password)
+                        st.session_state.users[user_to_modify]["password"] = base64.b64encode(hashed_password).decode(
+                            'utf-8')
 
-        # Selector de proyecto
-        nuevo_proyecto = st.selectbox("Proyecto", st.session_state.proyectos)
+                # Actualizar otros datos
+                st.session_state.users[user_to_modify]["nombre_completo"] = new_nombre
+                st.session_state.users[user_to_modify]["role"] = new_role
+
+                # Guardar cambios
+                save_users(st.session_state.users)
+                st.sidebar.success(f"Usuario {user_to_modify} modificado correctamente.")
+
+    elif admin_action == "Eliminar Usuario":
+        st.sidebar.subheader("Eliminar Usuario")
+        user_to_delete = st.sidebar.selectbox("Seleccionar Usuario", list(st.session_state.users.keys()))
+
+        if user_to_delete:
+            if user_to_delete == st.session_state.username:
+                st.sidebar.error("No puedes eliminar tu propio usuario.")
+            else:
+                if st.sidebar.button(f"Eliminar Usuario {user_to_delete}"):
+                    # Confirmar eliminación
+                    if st.sidebar.checkbox("Confirmar eliminación (esta acción no se puede deshacer)"):
+                        del st.session_state.users[user_to_delete]
+                        save_users(st.session_state.users)
+                        st.sidebar.success(f"Usuario {user_to_delete} eliminado correctamente.")
+
+                        # Contenido principal basado en la pestaña seleccionada
+                        if sidebar_tab == "Filtros":
+                            # Evitar errores si no hay datos después de filtrar
+                            if filtered_df.empty:
+                                st.warning("No hay datos que mostrar con los filtros actuales.")
+                            else:
+                                col1, col2 = st.columns(2)
+                                fecha_max = filtered_df['fecha'].max()
+                                fecha_inicio_30 = fecha_max - pd.Timedelta(days=29)
+                                ultimos_30_df = filtered_df[filtered_df['fecha'] >= fecha_inicio_30]
+
+                                # Métricas principales
+                                with col1:
+                                    st.markdown('<div class="metric-container">', unsafe_allow_html=True)
+                                    st.metric("Total Horas Registradas", f"{filtered_df['horas'].sum():.1f}")
+                                    st.markdown('</div>', unsafe_allow_html=True)
+
+                                with col2:
+                                    st.markdown('<div class="metric-container">', unsafe_allow_html=True)
+                                    promedio_horas_diarias = filtered_df.groupby('fecha')['horas'].sum().mean()
+                                    st.metric("Promedio Horas Diarias", f"{promedio_horas_diarias:.1f}")
+                                    st.markdown('</div>', unsafe_allow_html=True)
+
+                                # Sección 1: Distribución de Actividades
+                                st.markdown('<div class="section-header">Distribución de Actividades</div>',
+                                            unsafe_allow_html=True)
+                                col1, col2 = st.columns(2)
+
+                                with col1:
+                                    # Filtrar solo los últimos 30 días desde hoy
+                                    fecha_max = filtered_df['fecha'].max()
+                                    fecha_inicio_30 = fecha_max - pd.Timedelta(days=29)
+
+                                    ultimos_30_df = filtered_df[filtered_df['fecha'] >= fecha_inicio_30]
+
+                                    # Agrupar por actividad solo en ese rango
+                                    actividad_data = ultimos_30_df.groupby('actividad')['horas'].sum().reset_index()
+
+                                    fig_act = px.pie(
+                                        actividad_data,
+                                        values='horas',
+                                        names='actividad',
+                                        title='Distribución de Horas por Actividad (Últimos 30 días)',
+                                        color_discrete_sequence=px.colors.qualitative.Set3
+                                    )
+
+                                    fig_act.update_traces(textposition='inside', textinfo='percent+label')
+                                    st.plotly_chart(fig_act, use_container_width=True)
+
+                                with col2:
+                                    # Gráfico de distribución de horas por persona
+                                    persona_data = ultimos_30_df.groupby('persona')['horas'].sum().reset_index()
+                                    fig_per = px.bar(
+                                        persona_data,
+                                        x='persona',
+                                        y='horas',
+                                        title='Horas Totales por Persona (Últimos 30 días)',
+                                        color='persona',
+                                        color_discrete_sequence=px.colors.qualitative.Bold
+                                    )
+                                    st.plotly_chart(fig_per, use_container_width=True)
+
+                                # Sección de distribución por proyectos
+                                st.markdown('<div class="section-header">Distribución por Proyectos</div>',
+                                            unsafe_allow_html=True)
+
+                                # Gráfico de distribución de horas por proyecto
+                                proyecto_data = ultimos_30_df.groupby('proyecto')['horas'].sum().reset_index()
+                                fig_proy = px.bar(
+                                    proyecto_data,
+                                    x='proyecto',
+                                    y='horas',
+                                    title='Horas Totales por Proyecto (Últimos 30 días)',
+                                    color='proyecto',
+                                    color_discrete_sequence=px.colors.qualitative.Pastel
+                                )
+                                st.plotly_chart(fig_proy, use_container_width=True)
+
+                                # Matriz de proyectos y personas
+                                st.markdown('<div class="section-header">Matriz Proyectos-Personas</div>',
+                                            unsafe_allow_html=True)
+
+                                # Crear una tabla cruzada de proyectos por personas
+                                matriz_proy_pers = pd.pivot_table(
+                                    filtered_df,
+                                    values='horas',
+                                    index='proyecto',
+                                    columns='persona',
+                                    aggfunc='sum',
+                                    fill_value=0
+                                )
+
+                                # Mostrar como heatmap
+                                fig_matriz = px.imshow(
+                                    matriz_proy_pers,
+                                    text_auto='.1f',
+                                    color_continuous_scale='Blues',
+                                    title='Distribución de Horas por Proyecto y Persona'
+                                )
+                                fig_matriz.update_layout(height=400)
+                                st.plotly_chart(fig_matriz, use_container_width=True)
+
+                                # Sección 2: Evolución Temporal
+                                st.markdown('<div class="section-header">Evolución Temporal de Actividades</div>',
+                                            unsafe_allow_html=True)
+
+                                # Gráfico de línea de horas diarias
+                                daily_hours = filtered_df.groupby(['fecha', 'persona'])['horas'].sum().reset_index()
+                                fig_evol = px.line(
+                                    daily_hours,
+                                    x='fecha',
+                                    y='horas',
+                                    color='persona',
+                                    title='Evolución de Horas Registradas por Día',
+                                    markers=True
+                                )
+                                st.plotly_chart(fig_evol, use_container_width=True)
+
+                                # Evolución por proyecto
+                                daily_hours_proyecto = filtered_df.groupby(['fecha', 'proyecto'])[
+                                    'horas'].sum().reset_index()
+                                fig_evol_proy = px.line(
+                                    daily_hours_proyecto,
+                                    x='fecha',
+                                    y='horas',
+                                    color='proyecto',
+                                    title='Evolución de Horas por Proyecto',
+                                    markers=True
+                                )
+                                st.plotly_chart(fig_evol_proy, use_container_width=True)
+
+                                # Sección 4: Tabla de Datos Detallados
+                                st.markdown('<div class="section-header">Datos Detallados</div>',
+                                            unsafe_allow_html=True)
+
+                                # Añadir un input para filtrar por texto
+                                search_term = st.text_input("Buscar en los datos:", "")
+                                if search_term:
+                                    search_results = filtered_df[
+                                        filtered_df['persona'].str.contains(search_term, case=False) |
+                                        filtered_df['actividad'].str.contains(search_term, case=False) |
+                                        filtered_df['proyecto'].str.contains(search_term, case=False)
+                                        ]
+                                    st.dataframe(search_results, use_container_width=True)
+                                else:
+                                    st.dataframe(filtered_df, use_container_width=True)
+
+                        elif sidebar_tab == "Generación de Reportes":
+                            # Contenido principal para la pestaña de generación de reportes
+                            st.markdown('<div class="section-header">Generación de Reportes Personalizados</div>',
+                                        unsafe_allow_html=True)
+
+                            if st.session_state.user_role == "admin":
+                                st.markdown("""
+                                <div class="report-section">
+                                    <h3>Instrucciones para Generar Reportes</h3>
+                                    <p>Para generar un reporte personalizado, sigue estos pasos:</p>
+                                    <ol>
+                                        <li>En la barra lateral, selecciona el rango de fechas para el reporte.</li>
+                                        <li>Elige las personas que deseas incluir en el reporte.</li>
+                                        <li>Establece un título para tu reporte.</li>
+                                        <li>Haz clic en el botón "Generar Reporte".</li>
+                                        <li>Una vez generado, podrás descargar el reporte en formato PDF o los datos en CSV.</li>
+                                    </ol>
+                                    <p>Los reportes incluyen:</p>
+                                    <ul>
+                                        <li>Resumen general con total de horas y promedios.</li>
+                                        <li>Detalle por persona con horas por proyecto y actividad.</li>
+                                        <li>Listado completo de registros de actividades.</li>
+                                    </ul>
+                                </div>
+                                """, unsafe_allow_html=True)
+
+                                st.markdown('<div class="section-header">Generar Reportes</div>',
+                                            unsafe_allow_html=True)
+                                st.info(
+                                    "Configura las opciones del reporte en la barra lateral y haz clic en 'Generar Reporte' para crear tu informe personalizado.")
+                            else:
+                                st.warning(
+                                    "Solo los administradores pueden generar reportes. Si necesitas un reporte de tus actividades, contacta con un administrador.")
+
+                        elif sidebar_tab == "Administración de Usuarios" and st.session_state.user_role == "admin":
+                            st.markdown('<div class="section-header">Administración de Usuarios</div>',
+                                        unsafe_allow_html=True)
+
+                            st.markdown("""
+                            <div class="admin-section">
+                                <h3>Panel de Administración de Usuarios</h3>
+                                <p>En este panel puedes gestionar los usuarios del sistema:</p>
+                                <ul>
+                                    <li><strong>Ver Usuarios:</strong> Lista de todos los usuarios registrados en el sistema.</li>
+                                    <li><strong>Crear Usuario:</strong> Registra nuevos usuarios asignándoles un rol (administrador o usuario normal).</li>
+                                    <li><strong>Modificar Usuario:</strong> Actualiza la información de los usuarios existentes.</li>
+                                    <li><strong>Eliminar Usuario:</strong> Elimina usuarios del sistema (excepto tu propio usuario).</li>
+                                </ul>
+                                <p>Selecciona la acción que deseas realizar en el menú lateral.</p>
+                            </div>
+                            """, unsafe_allow_html=True)
+
+                            # Mostrar tabla de usuarios
+                            st.subheader("Lista de Usuarios")
+
+                            users_data = []
+                            for username, info in st.session_state.users.items():
+                                users_data.append({
+                                    "Usuario": username,
+                                    "Nombre Completo": info.get("nombre_completo", username),
+                                    "Rol": info.get("role", "user")
+                                })
+
+                            users_df = pd.DataFrame(users_data)
+                            st.dataframe(users_df, use_container_width=True)
+
+                        # Sección de registro de nueva actividad (visible en todas las pestañas excepto en la de generación de reportes)
+                        if sidebar_tab != "Generación de Reportes" and sidebar_tab != "Administración de Usuarios":
+                            st.markdown('<div class="section-header">Registrar Nueva Actividad</div>',
+                                        unsafe_allow_html=True)
+
+                            col1, col2, col3 = st.columns(3)
+
+                            with col1:
+                                nueva_fecha = st.date_input("Fecha", datetime.now())
+
+                                # Determinar la persona según el rol
+                                if st.session_state.user_role == "admin":
+                                    # Los administradores pueden registrar actividades para cualquier persona
+                                    personas_disponibles = sorted(
+                                        st.session_state.actividades_personalizadas.keys()) if st.session_state.actividades_personalizadas else [
+                                        st.session_state.username]
+                                    nueva_persona = st.selectbox("Persona", personas_disponibles,
+                                                                 index=personas_disponibles.index(
+                                                                     st.session_state.username) if st.session_state.username in personas_disponibles else 0)
+                                else:
+                                    # Los usuarios normales solo pueden registrar sus propias actividades
+                                    nueva_persona = st.session_state.username
+                                    st.write(f"Persona: {st.session_state.nombre_completo}")
+
+                            with col2:
+                                # Las actividades se cargan dinámicamente según la persona seleccionada
+                                if nueva_persona not in st.session_state.actividades_personalizadas:
+                                    st.session_state.actividades_personalizadas[nueva_persona] = ["Trabajo autónomo",
+                                                                                                  "Reuniones"]
+
+                                actividades_persona_seleccionada = st.session_state.actividades_personalizadas.get(
+                                    nueva_persona, [])
+                                if actividades_persona_seleccionada:
+                                    nueva_actividad = st.selectbox("Actividad", actividades_persona_seleccionada)
+                                else:
+                                    nueva_actividad = st.text_input("Actividad (no hay actividades predefinidas)")
+
+                                # Selector de proyecto
+                                nuevo_proyecto = st.selectbox("Proyecto", st.session_state.proyectos)
 
     with col3:
         # Cambiar el input de horas a un slider
@@ -832,15 +1246,19 @@ if sidebar_tab != "Generación de Reportes":
         if nueva_actividad_checkbox:
             nueva_actividad_nombre = st.text_input("Nombre de la nueva actividad")
             if st.button("Añadir a mi lista") and nueva_actividad_nombre.strip():
-                # Agregar la nueva actividad a la lista de la persona
-                st.session_state.actividades_personalizadas[nueva_persona].append(nueva_actividad_nombre.strip())
-                st.success(f"Actividad '{nueva_actividad_nombre}' añadida a la lista de {nueva_persona}")
+                # Verificar si la actividad ya existe
+                if nueva_actividad_nombre in st.session_state.actividades_personalizadas[nueva_persona]:
+                    st.warning(f"La actividad '{nueva_actividad_nombre}' ya existe en la lista.")
+                else:
+                    # Agregar la nueva actividad a la lista de la persona
+                    st.session_state.actividades_personalizadas[nueva_persona].append(nueva_actividad_nombre.strip())
+                    st.success(f"Actividad '{nueva_actividad_nombre}' añadida a la lista de {nueva_persona}")
 
-                # Actualizar la variable para que se pueda seleccionar inmediatamente
-                nueva_actividad = nueva_actividad_nombre.strip()
+                    # Actualizar la variable para que se pueda seleccionar inmediatamente
+                    nueva_actividad = nueva_actividad_nombre.strip()
 
     # Botón para registrar la actividad
-    submit_button = st.button("Registrar Actividad")
+    submit_button = st.button("Registrar Actividad", use_container_width=True)
 
     if submit_button:
         # Validar los datos
@@ -868,32 +1286,50 @@ if sidebar_tab != "Generación de Reportes":
             # Para mostrar cómo se vería
             st.dataframe(new_row, use_container_width=True)
 
-    # Opción para añadir un nuevo proyecto directamente
-    st.markdown('<div class="section-header">Añadir Nuevo Proyecto</div>', unsafe_allow_html=True)
+            # Mostrar botón para volver a rellenar
+            st.write("¿Deseas registrar otra actividad similar?")
+            if st.button("Registrar Actividad Similar", use_container_width=True):
+                st.rerun()
 
-    nuevo_proyecto_nombre = st.text_input("Nombre del nuevo proyecto")
-    if st.button("Añadir Proyecto") and nuevo_proyecto_nombre.strip():
-        # Verificar si el proyecto ya existe
-        if nuevo_proyecto_nombre in st.session_state.proyectos:
-            st.warning(f"El proyecto '{nuevo_proyecto_nombre}' ya existe en la lista.")
-        else:
-            # Agregar el nuevo proyecto a la lista
-            st.session_state.proyectos.append(nuevo_proyecto_nombre.strip())
-            st.success(f"Proyecto '{nuevo_proyecto_nombre}' añadido a la lista de proyectos")
+    # Opción para añadir un nuevo proyecto directamente (solo para administradores)
+    if st.session_state.user_role == "admin":
+        st.markdown('<div class="section-header">Añadir Nuevo Proyecto</div>', unsafe_allow_html=True)
 
-# Notas informativas
-st.markdown("""
----
-**Notas:**
-- Este dashboard permite a cada persona mantener su propia lista personalizada de actividades.
-- Se pueden añadir nuevas actividades desde la sección de "Gestión de Actividades" en la barra lateral o al registrar una nueva actividad.
-- Los proyectos pueden ser administrados desde la sección "Gestión de Proyectos" en la barra lateral o añadiendo un nuevo proyecto directamente.
-- Los reportes personalizados se pueden generar desde la sección "Generación de Reportes" en la barra lateral.
-- En una implementación real, los datos se guardarían en una base de datos persistente.
-""")
+        nuevo_proyecto_nombre = st.text_input("Nombre del nuevo proyecto")
+        if st.button("Añadir Proyecto", use_container_width=True) and nuevo_proyecto_nombre.strip():
+            # Verificar si el proyecto ya existe
+            if nuevo_proyecto_nombre in st.session_state.proyectos:
+                st.warning(f"El proyecto '{nuevo_proyecto_nombre}' ya existe en la lista.")
+            else:
+                # Agregar el nuevo proyecto a la lista
+                st.session_state.proyectos.append(nuevo_proyecto_nombre.strip())
+                st.success(f"Proyecto '{nuevo_proyecto_nombre}' añadido a la lista de proyectos")
+
+# Notas informativas según el rol del usuario
+if st.session_state.user_role == "admin":
+    # Notas para administradores
+    st.markdown("""
+    ---
+    **Notas para Administradores:**
+    - Puedes ver y editar las actividades de todos los usuarios.
+    - Gestiona proyectos desde la sección "Gestión de Proyectos".
+    - Genera reportes personalizados desde la sección "Generación de Reportes".
+    - Administra usuarios desde la sección "Administración de Usuarios".
+    - Los datos se guardan en archivos CSV locales (en una implementación real, usarías una base de datos).
+    """)
+else:
+    # Notas para usuarios normales
+    st.markdown("""
+    ---
+    **Notas para Usuarios:**
+    - Solo puedes ver y editar tus propias actividades.
+    - Personaliza tu lista de actividades desde la sección "Gestión de Actividades".
+    - Para obtener reportes o añadir nuevos proyectos, contacta con un administrador.
+    - Tus datos son visibles para los administradores del sistema.
+    """)
 
 # Información de la aplicación en el footer
 st.markdown("""
 ---
-Desarrollado con Streamlit | Dashboard de Seguimiento de Actividades y Proyectos
+Desarrollado con Streamlit | Dashboard de Seguimiento de Actividades con Control de Acceso
 """)
