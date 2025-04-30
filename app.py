@@ -197,49 +197,38 @@ def get_pdf_download_link(pdf_bytes, filename, text):
     href = f'<a href="data:application/pdf;base64,{b64}" download="{filename}">{text}</a>'
     return href
 
-# Función para identificar festivos en Colombia
-def es_festivo_colombia(fecha):
-    # Lista de festivos en Colombia para 2024-2025
-    festivos = [
-        # 2024
-        datetime(2024, 1, 1).date(),  # Año Nuevo
-        datetime(2024, 1, 8).date(),  # Día de los Reyes Magos
-        datetime(2024, 3, 25).date(),  # Día de San José
-        datetime(2024, 3, 28).date(),  # Jueves Santo
-        datetime(2024, 3, 29).date(),  # Viernes Santo
-        datetime(2024, 5, 1).date(),  # Día del Trabajo
-        datetime(2024, 5, 13).date(),  # Día de la Ascensión
-        datetime(2024, 6, 3).date(),  # Corpus Christi
-        datetime(2024, 6, 10).date(),  # Sagrado Corazón
-        datetime(2024, 7, 1).date(),  # San Pedro y San Pablo
-        datetime(2024, 7, 20).date(),  # Día de la Independencia
-        datetime(2024, 8, 7).date(),  # Batalla de Boyacá
-        datetime(2024, 8, 19).date(),  # Asunción de la Virgen
-        datetime(2024, 10, 14).date(),  # Día de la Raza
-        datetime(2024, 11, 4).date(),  # Todos los Santos
-        datetime(2024, 11, 11).date(),  # Independencia de Cartagena
-        datetime(2024, 12, 8).date(),  # Día de la Inmaculada Concepción
-        datetime(2024, 12, 25).date(),  # Navidad
-        # 2025
-        datetime(2025, 1, 1).date(),  # Año Nuevo
-        datetime(2025, 1, 6).date(),  # Día de los Reyes Magos
-        datetime(2025, 3, 24).date(),  # Día de San José
-        datetime(2025, 4, 17).date(),  # Jueves Santo
-        datetime(2025, 4, 18).date(),  # Viernes Santo
-        datetime(2025, 5, 1).date(),  # Día del Trabajo
-        datetime(2025, 6, 2).date(),  # Día de la Ascensión
-        datetime(2025, 6, 23).date(),  # Corpus Christi
-        datetime(2025, 6, 30).date(),  # Sagrado Corazón
-        datetime(2025, 7, 20).date(),  # Día de la Independencia
-        datetime(2025, 8, 7).date(),  # Batalla de Boyacá
-        datetime(2025, 8, 18).date(),  # Asunción de la Virgen
-        datetime(2025, 10, 13).date(),  # Día de la Raza
-        datetime(2025, 11, 3).date(),  # Todos los Santos
-        datetime(2025, 11, 17).date(),  # Independencia de Cartagena
-        datetime(2025, 12, 8).date(),  # Día de la Inmaculada Concepción
-        datetime(2025, 12, 25).date(),  # Navidad
-    ]
-    return fecha in festivos
+# Función auxiliar para obtener fechas de manera segura
+def get_safe_date_range(df, date_column='fecha'):
+    """Obtiene el rango de fechas de manera segura, manejando diferentes tipos de datos"""
+    try:
+        if df.empty:
+            today = datetime.now().date()
+            return today, today
+            
+        # Asegurarse de que la columna sea datetime
+        if not pd.api.types.is_datetime64_any_dtype(df[date_column]):
+            try:
+                # Ya intentamos convertir antes, pero asegurémonos aquí también
+                df[date_column] = pd.to_datetime(df[date_column])
+            except:
+                # Si falla, retornamos fecha actual
+                today = datetime.now().date()
+                return today, today
+        
+        # Obtener min y max, y convertir a date de Python
+        min_date = pd.Timestamp(df[date_column].min()).date()
+        max_date = pd.Timestamp(df[date_column].max()).date()
+        
+        return min_date, max_date
+    except Exception as e:
+        # En caso de cualquier error, retornar fecha actual
+        print(f"Error obteniendo rango de fechas: {e}")
+        today = datetime.now().date()
+        return today, today
+        # En caso de cualquier error, retornar fecha actual
+        print(f"Error obteniendo rango de fechas: {e}")
+        today = datetime.now().date()
+        return today, today
 
 # Función para determinar si un día es laboral (no es fin de semana ni festivo)
 def es_dia_laboral(fecha):
@@ -675,15 +664,8 @@ if sidebar_tab == "Filtros":
 
     # Filtro de fechas
     if not st.session_state.data.empty:
-        # Asegurarnos de que las fechas estén en formato datetime
-        if pd.api.types.is_string_dtype(st.session_state.data['fecha']):
-            # Si las fechas son strings, convertirlas a datetime
-            min_date = pd.to_datetime(st.session_state.data['fecha'].min()).date()
-            max_date = pd.to_datetime(st.session_state.data['fecha'].max()).date()
-        else:
-            # Si ya son datetime, obtener el min y max
-            min_date = st.session_state.data['fecha'].min().date()
-            max_date = st.session_state.data['fecha'].max().date()
+        # Usar nuestra función segura para obtener las fechas
+        min_date, max_date = get_safe_date_range(st.session_state.data)
     else:
         min_date = datetime.now().date()
         max_date = datetime.now().date()
@@ -760,15 +742,8 @@ elif sidebar_tab == "Generación de Reportes":
     else:
         # Filtro de fechas para el reporte
         if not st.session_state.data.empty:
-            # Asegurarnos de que las fechas estén en formato datetime
-            if pd.api.types.is_string_dtype(st.session_state.data['fecha']):
-                # Si las fechas son strings, convertirlas a datetime
-                min_date = pd.to_datetime(st.session_state.data['fecha'].min()).date()
-                max_date = pd.to_datetime(st.session_state.data['fecha'].max()).date()
-            else:
-                # Si ya son datetime, obtener el min y max
-                min_date = st.session_state.data['fecha'].min().date()
-                max_date = st.session_state.data['fecha'].max().date()
+            # Usar nuestra función segura para obtener las fechas
+            min_date, max_date = get_safe_date_range(st.session_state.data)
         else:
             min_date = datetime.now().date()
             max_date = datetime.now().date()
