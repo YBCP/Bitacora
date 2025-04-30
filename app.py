@@ -197,34 +197,54 @@ def get_pdf_download_link(pdf_bytes, filename, text):
     href = f'<a href="data:application/pdf;base64,{b64}" download="{filename}">{text}</a>'
     return href
 
-# Función auxiliar para obtener fechas de manera segura
-def get_safe_date_range(df, date_column='fecha'):
-    """Obtiene el rango de fechas de manera segura, manejando diferentes tipos de datos"""
-    try:
-        if df.empty:
-            today = datetime.now().date()
-            return today, today
-            
-        # Asegurarse de que la columna sea datetime
-        if not pd.api.types.is_datetime64_any_dtype(df[date_column]):
-            try:
-                # Ya intentamos convertir antes, pero asegurémonos aquí también
-                df[date_column] = pd.to_datetime(df[date_column])
-            except:
-                # Si falla, retornamos fecha actual
-                today = datetime.now().date()
-                return today, today
+# Función para identificar festivos en Colombia
+def es_festivo_colombia(fecha):
+    # Lista de festivos en Colombia para 2024-2025
+    festivos = [
+        # 2024
+        datetime(2024, 1, 1).date(),  # Año Nuevo
+        datetime(2024, 1, 8).date(),  # Día de los Reyes Magos
+        datetime(2024, 3, 25).date(),  # Día de San José
+        datetime(2024, 3, 28).date(),  # Jueves Santo
+        datetime(2024, 3, 29).date(),  # Viernes Santo
+        datetime(2024, 5, 1).date(),  # Día del Trabajo
+        datetime(2024, 5, 13).date(),  # Día de la Ascensión
+        datetime(2024, 6, 3).date(),  # Corpus Christi
+        datetime(2024, 6, 10).date(),  # Sagrado Corazón
+        datetime(2024, 7, 1).date(),  # San Pedro y San Pablo
+        datetime(2024, 7, 20).date(),  # Día de la Independencia
+        datetime(2024, 8, 7).date(),  # Batalla de Boyacá
+        datetime(2024, 8, 19).date(),  # Asunción de la Virgen
+        datetime(2024, 10, 14).date(),  # Día de la Raza
+        datetime(2024, 11, 4).date(),  # Todos los Santos
+        datetime(2024, 11, 11).date(),  # Independencia de Cartagena
+        datetime(2024, 12, 8).date(),  # Día de la Inmaculada Concepción
+        datetime(2024, 12, 25).date(),  # Navidad
+        # 2025
+        datetime(2025, 1, 1).date(),  # Año Nuevo
+        datetime(2025, 1, 6).date(),  # Día de los Reyes Magos
+        datetime(2025, 3, 24).date(),  # Día de San José
+        datetime(2025, 4, 17).date(),  # Jueves Santo
+        datetime(2025, 4, 18).date(),  # Viernes Santo
+        datetime(2025, 5, 1).date(),  # Día del Trabajo
+        datetime(2025, 6, 2).date(),  # Día de la Ascensión
+        datetime(2025, 6, 23).date(),  # Corpus Christi
+        datetime(2025, 6, 30).date(),  # Sagrado Corazón
+        datetime(2025, 7, 20).date(),  # Día de la Independencia
+        datetime(2025, 8, 7).date(),  # Batalla de Boyacá
+        datetime(2025, 8, 18).date(),  # Asunción de la Virgen
+        datetime(2025, 10, 13).date(),  # Día de la Raza
+        datetime(2025, 11, 3).date(),  # Todos los Santos
+        datetime(2025, 11, 17).date(),  # Independencia de Cartagena
+        datetime(2025, 12, 8).date(),  # Día de la Inmaculada Concepción
+        datetime(2025, 12, 25).date(),  # Navidad
+    ]
+    
+    # Asegurarnos que la fecha esté en formato date
+    if hasattr(fecha, 'date') and callable(getattr(fecha, 'date')):
+        fecha = fecha.date()
         
-        # Obtener min y max, y convertir a date de Python
-        min_date = pd.Timestamp(df[date_column].min()).date()
-        max_date = pd.Timestamp(df[date_column].max()).date()
-        
-        return min_date, max_date
-    except Exception as e:
-        # En caso de cualquier error, retornar fecha actual
-        print(f"Error obteniendo rango de fechas: {e}")
-        today = datetime.now().date()
-        return today, today
+    return fecha in festivos
         # En caso de cualquier error, retornar fecha actual
         print(f"Error obteniendo rango de fechas: {e}")
         today = datetime.now().date()
@@ -232,6 +252,10 @@ def get_safe_date_range(df, date_column='fecha'):
 
 # Función para determinar si un día es laboral (no es fin de semana ni festivo)
 def es_dia_laboral(fecha):
+    # Asegurarnos que la fecha esté en formato date
+    if hasattr(fecha, 'date') and callable(getattr(fecha, 'date')):
+        fecha = fecha.date()
+        
     # Verificar si no es sábado (5) ni domingo (6)
     if fecha.weekday() >= 5:
         return False
@@ -242,6 +266,12 @@ def es_dia_laboral(fecha):
 
 # Función para calcular días laborables entre dos fechas
 def dias_laborables_entre_fechas(fecha_inicio, fecha_fin):
+    # Asegurarnos que las fechas están en formato date
+    if hasattr(fecha_inicio, 'date') and callable(getattr(fecha_inicio, 'date')):
+        fecha_inicio = fecha_inicio.date()
+    if hasattr(fecha_fin, 'date') and callable(getattr(fecha_fin, 'date')):
+        fecha_fin = fecha_fin.date()
+        
     dias_laborables = 0
     fecha_actual = fecha_inicio
     while fecha_actual <= fecha_fin:
@@ -815,22 +845,26 @@ elif sidebar_tab == "Generación de Reportes":
             if report_data.empty:
                 st.sidebar.error("No hay datos disponibles para el reporte con los filtros seleccionados.")
             else:
-                # Generar PDF
-                pdf_bytes = generate_pdf_report(report_data, report_title, report_start_date, report_end_date,
-                                                report_personas)
+                try:
+                    # Generar PDF
+                    pdf_bytes = generate_pdf_report(report_data, report_title, report_start_date, report_end_date,
+                                                    report_personas)
 
-                # Crear link de descarga para el PDF
-                report_filename = f"reporte_{report_start_date}_a_{report_end_date}.pdf"
-                st.sidebar.markdown(get_pdf_download_link(pdf_bytes, report_filename,
-                                                          "📥 Descargar Reporte PDF"), unsafe_allow_html=True)
+                    # Crear link de descarga para el PDF
+                    report_filename = f"reporte_{report_start_date.strftime('%Y-%m-%d')}_a_{report_end_date.strftime('%Y-%m-%d')}.pdf"
+                    st.sidebar.markdown(get_pdf_download_link(pdf_bytes, report_filename,
+                                                            "📥 Descargar Reporte PDF"), unsafe_allow_html=True)
 
-                # También ofrecer la opción de descarga en CSV
-                st.sidebar.markdown(get_download_link(report_data,
-                                                      f"datos_reporte_{report_start_date}_a_{report_end_date}.csv",
-                                                      "📥 Descargar Datos del Reporte (CSV)"), unsafe_allow_html=True)
+                    # También ofrecer la opción de descarga en CSV
+                    st.sidebar.markdown(get_download_link(report_data,
+                                                        f"datos_reporte_{report_start_date.strftime('%Y-%m-%d')}_a_{report_end_date.strftime('%Y-%m-%d')}.csv",
+                                                        "📥 Descargar Datos del Reporte (CSV)"), unsafe_allow_html=True)
 
-                # Mostrar una vista previa
-                st.sidebar.success(f"Reporte generado con {len(report_data)} registros")
+                    # Mostrar una vista previa
+                    st.sidebar.success(f"Reporte generado con {len(report_data)} registros")
+                except Exception as e:
+                    st.sidebar.error(f"Error al generar el reporte: {str(e)}")
+                    st.sidebar.info("Por favor, intenta con un rango de fechas diferente o contacta al administrador.")
 
 elif sidebar_tab == "Gestión de Actividades":
     st.sidebar.header("Personalizar Actividades")
