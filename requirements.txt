@@ -5,4 +5,3 @@ plotly
 fpdf
 matplotlib
 datetime
-base64
