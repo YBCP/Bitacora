@@ -245,10 +245,10 @@ def es_festivo_colombia(fecha):
         fecha = fecha.date()
         
     return fecha in festivos
-        # En caso de cualquier error, retornar fecha actual
-        print(f"Error obteniendo rango de fechas: {e}")
-        today = datetime.now().date()
-        return today, today
+    # En caso de cualquier error, retornar fecha actual
+    print(f"Error obteniendo rango de fechas: {e}")
+    today = datetime.now().date()
+    return today, today
 
 # Función para determinar si un día es laboral (no es fin de semana ni festivo)
 def es_dia_laboral(fecha):
