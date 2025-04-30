@@ -107,6 +107,34 @@ if 'nombre_completo' not in st.session_state:
 # Inicializar la contraseña para reportes (en una aplicación real, usarías un método más seguro)
 REPORT_PASSWORD_HASH = hashlib.sha256("admin123".encode()).hexdigest()
 
+# Función auxiliar para obtener fechas de manera segura
+def get_safe_date_range(df, date_column='fecha'):
+    """Obtiene el rango de fechas de manera segura, manejando diferentes tipos de datos"""
+    try:
+        if df.empty:
+            today = datetime.now().date()
+            return today, today
+        
+        # Asegurarse de que la columna sea datetime
+        if not pd.api.types.is_datetime64_any_dtype(df[date_column]):
+            try:
+                # Ya intentamos convertir antes, pero asegurémonos aquí también
+                df[date_column] = pd.to_datetime(df[date_column])
+            except:
+                # Si falla, retornamos fecha actual
+                today = datetime.now().date()
+                return today, today
+        
+        # Obtener min y max, y convertir a date de Python
+        min_date = pd.Timestamp(df[date_column].min()).date()
+        max_date = pd.Timestamp(df[date_column].max()).date()
+        
+        return min_date, max_date
+    except Exception as e:
+        # En caso de cualquier error, retornar fecha actual
+        today = datetime.now().date()
+        return today, today
+
 # Función para crear hash seguro de contraseña con salt
 def hash_password(password, salt=None):
     if salt is None:
@@ -245,7 +273,7 @@ def es_festivo_colombia(fecha):
         fecha = fecha.date()
         
     return fecha in festivos
-    # En caso de cualquier error, retornar fecha actual
+        # En caso de cualquier error, retornar fecha actual
     print(f"Error obteniendo rango de fechas: {e}")
     today = datetime.now().date()
     return today, today
