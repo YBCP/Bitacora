@@ -1,0 +1,674 @@
+fecha,persona,actividad,proyecto,horas
+2025-04-01,Cesar Ramirez,Trabajo autónomo,Datos Temáticos,1.0
+2025-04-01,Cesar Ramirez,Reuniones,Cartografía,4.2
+2025-04-01,Cristian Martínez,Trabajo autónomo,Análisis de Datos,6.1
+2025-04-01,Cristian Martínez,Reuniones,Cartografía,1.9
+2025-04-01,Nestor Roldan,Trabajo autónomo,Mapa de Referencia,5.7
+2025-04-01,Nestor Roldan,Reuniones,Datos Temáticos,6.5
+2025-04-01,Hernan Bernal,Trabajo autónomo,Mapa de Referencia,4.6
+2025-04-01,Hernan Bernal,Reuniones,Cartografía,1.9
+2025-04-01,Daniel Morales,Trabajo autónomo,Cartografía,2.9
+2025-04-01,Leila Awad,Reuniones,Cartografía,1.5
+2025-04-01,Ninfa Carolina Menjura,Trabajo autónomo,Cartografía,7.0
+2025-04-01,Yair Morales,Trabajo autónomo,Análisis de Datos,6.1
+2025-04-01,Daniel Gonzalez,Trabajo autónomo,Análisis de Datos,2.8
+2025-04-01,Daniel Gonzalez,Reuniones,Mapa de Referencia,6.3
+2025-04-01,Diana Carvajal,Reuniones,Mapa de Referencia,1.3
+2025-04-01,Diego Marin,Trabajo autónomo,Mapa de Referencia,6.5
+2025-04-01,Jairo Perdomo,Trabajo autónomo,Cartografía,5.5
+2025-04-01,Jairo Perdomo,Reuniones,Cartografía,4.8
+2025-04-01,Maria Bernate,Trabajo autónomo,Mapa de Referencia,4.5
+2025-04-01,Maria Bernate,Reuniones,Cartografía,4.5
+2025-04-01,Martha Vargas,Trabajo autónomo,Datos Temáticos,3.4
+2025-04-02,Cristian Martínez,Trabajo autónomo,Análisis de Datos,5.0
+2025-04-02,Cristian Martínez,Reuniones,Mapa de Referencia,4.9
+2025-04-02,Nestor Roldan,Reuniones,Datos Temáticos,6.1
+2025-04-02,Hernan Bernal,Trabajo autónomo,Cartografía,2.8
+2025-04-02,Hernan Bernal,Reuniones,Cartografía,7.1
+2025-04-02,Daniel Morales,Reuniones,Datos Temáticos,7.4
+2025-04-02,Leila Awad,Reuniones,Mapa de Referencia,5.2
+2025-04-02,Ninfa Carolina Menjura,Trabajo autónomo,Cartografía,1.7
+2025-04-02,Ninfa Carolina Menjura,Reuniones,Análisis de Datos,7.5
+2025-04-02,Yair Morales,Trabajo autónomo,Mapa de Referencia,1.4
+2025-04-02,Yair Morales,Reuniones,Análisis de Datos,2.6
+2025-04-02,Daniel Gonzalez,Trabajo autónomo,Datos Temáticos,2.4
+2025-04-02,Daniel Gonzalez,Reuniones,Datos Temáticos,7.9
+2025-04-02,Diana Carvajal,Trabajo autónomo,Cartografía,4.1
+2025-04-02,Diego Marin,Reuniones,Cartografía,7.7
+2025-04-02,Laura Rodríguez,Trabajo autónomo,Cartografía,7.6
+2025-04-02,Luz Carolina Galvis,Reuniones,Datos Temáticos,5.4
+2025-04-02,Maria Bernate,Trabajo autónomo,Análisis de Datos,5.1
+2025-04-02,Maria Bernate,Reuniones,Análisis de Datos,1.4
+2025-04-02,Martha Vargas,Reuniones,Datos Temáticos,6.0
+2025-04-03,Cesar Ramirez,Trabajo autónomo,Datos Temáticos,2.6
+2025-04-03,Cesar Ramirez,Reuniones,Análisis de Datos,1.1
+2025-04-03,Cristian Martínez,Trabajo autónomo,Datos Temáticos,4.3
+2025-04-03,Cristian Martínez,Reuniones,Cartografía,6.5
+2025-04-03,Nestor Roldan,Reuniones,Datos Temáticos,1.7
+2025-04-03,Hernan Bernal,Reuniones,Análisis de Datos,6.6
+2025-04-03,Leila Awad,Trabajo autónomo,Datos Temáticos,2.8
+2025-04-03,Ninfa Carolina Menjura,Trabajo autónomo,Datos Temáticos,5.1
+2025-04-03,Yair Morales,Trabajo autónomo,Mapa de Referencia,7.3
+2025-04-03,Daniel Gonzalez,Trabajo autónomo,Análisis de Datos,4.1
+2025-04-03,Daniel Gonzalez,Reuniones,Mapa de Referencia,5.8
+2025-04-03,Diana Carvajal,Trabajo autónomo,Análisis de Datos,6.3
+2025-04-03,Diana Carvajal,Reuniones,Datos Temáticos,2.1
+2025-04-03,Diego Marin,Trabajo autónomo,Datos Temáticos,5.4
+2025-04-03,Diego Marin,Reuniones,Análisis de Datos,1.6
+2025-04-03,Laura Rodríguez,Trabajo autónomo,Mapa de Referencia,4.9
+2025-04-03,Luz Carolina Galvis,Reuniones,Datos Temáticos,2.1
+2025-04-03,Maria Bernate,Trabajo autónomo,Datos Temáticos,4.1
+2025-04-03,Maria Bernate,Reuniones,Análisis de Datos,6.7
+2025-04-03,Martha Vargas,Trabajo autónomo,Análisis de Datos,4.5
+2025-04-03,Martha Vargas,Reuniones,Cartografía,1.6
+2025-04-04,Cesar Ramirez,Trabajo autónomo,Datos Temáticos,2.2
+2025-04-04,Cesar Ramirez,Reuniones,Cartografía,5.8
+2025-04-04,Cristian Martínez,Trabajo autónomo,Cartografía,4.3
+2025-04-04,Nestor Roldan,Reuniones,Mapa de Referencia,1.9
+2025-04-04,Hernan Bernal,Trabajo autónomo,Datos Temáticos,2.2
+2025-04-04,Daniel Morales,Trabajo autónomo,Datos Temáticos,6.7
+2025-04-04,Daniel Morales,Reuniones,Datos Temáticos,4.9
+2025-04-04,Leila Awad,Trabajo autónomo,Mapa de Referencia,7.1
+2025-04-04,Leila Awad,Reuniones,Cartografía,3.8
+2025-04-04,Ninfa Carolina Menjura,Trabajo autónomo,Análisis de Datos,3.5
+2025-04-04,Ninfa Carolina Menjura,Reuniones,Mapa de Referencia,5.6
+2025-04-04,Yair Morales,Trabajo autónomo,Cartografía,8.0
+2025-04-04,Daniel Gonzalez,Trabajo autónomo,Mapa de Referencia,2.2
+2025-04-04,Daniel Gonzalez,Reuniones,Análisis de Datos,2.7
+2025-04-04,Diana Carvajal,Reuniones,Mapa de Referencia,3.0
+2025-04-04,Diego Marin,Trabajo autónomo,Mapa de Referencia,6.6
+2025-04-04,Diego Marin,Reuniones,Datos Temáticos,6.4
+2025-04-04,Jairo Perdomo,Trabajo autónomo,Cartografía,2.0
+2025-04-04,Jairo Perdomo,Reuniones,Mapa de Referencia,6.5
+2025-04-04,Laura Rodríguez,Trabajo autónomo,Cartografía,6.5
+2025-04-04,Laura Rodríguez,Reuniones,Cartografía,4.1
+2025-04-04,Luz Carolina Galvis,Trabajo autónomo,Análisis de Datos,7.1
+2025-04-04,Luz Carolina Galvis,Reuniones,Datos Temáticos,3.6
+2025-04-04,Maria Bernate,Trabajo autónomo,Datos Temáticos,4.5
+2025-04-04,Maria Bernate,Reuniones,Datos Temáticos,1.9
+2025-04-04,Martha Vargas,Trabajo autónomo,Datos Temáticos,5.8
+2025-04-05,Cesar Ramirez,Reuniones,Cartografía,7.5
+2025-04-05,Cristian Martínez,Trabajo autónomo,Análisis de Datos,7.3
+2025-04-05,Cristian Martínez,Reuniones,Datos Temáticos,6.1
+2025-04-05,Nestor Roldan,Reuniones,Mapa de Referencia,4.2
+2025-04-05,Hernan Bernal,Trabajo autónomo,Datos Temáticos,5.2
+2025-04-05,Hernan Bernal,Reuniones,Cartografía,4.0
+2025-04-05,Daniel Morales,Trabajo autónomo,Mapa de Referencia,1.7
+2025-04-05,Daniel Morales,Reuniones,Cartografía,6.7
+2025-04-05,Leila Awad,Reuniones,Análisis de Datos,2.0
+2025-04-05,Ninfa Carolina Menjura,Reuniones,Cartografía,7.2
+2025-04-05,Diana Carvajal,Trabajo autónomo,Cartografía,1.9
+2025-04-05,Diego Marin,Reuniones,Datos Temáticos,3.0
+2025-04-05,Jairo Perdomo,Trabajo autónomo,Cartografía,2.9
+2025-04-05,Jairo Perdomo,Reuniones,Cartografía,6.0
+2025-04-05,Laura Rodríguez,Trabajo autónomo,Cartografía,7.7
+2025-04-05,Luz Carolina Galvis,Trabajo autónomo,Datos Temáticos,6.2
+2025-04-05,Luz Carolina Galvis,Reuniones,Análisis de Datos,3.3
+2025-04-05,Maria Bernate,Trabajo autónomo,Datos Temáticos,5.3
+2025-04-05,Martha Vargas,Reuniones,Datos Temáticos,6.3
+2025-04-06,Cesar Ramirez,Reuniones,Datos Temáticos,1.2
+2025-04-06,Cristian Martínez,Trabajo autónomo,Análisis de Datos,1.8
+2025-04-06,Nestor Roldan,Reuniones,Análisis de Datos,6.5
+2025-04-06,Hernan Bernal,Trabajo autónomo,Cartografía,7.9
+2025-04-06,Hernan Bernal,Reuniones,Análisis de Datos,2.3
+2025-04-06,Daniel Morales,Trabajo autónomo,Análisis de Datos,3.1
+2025-04-06,Leila Awad,Trabajo autónomo,Cartografía,4.6
+2025-04-06,Ninfa Carolina Menjura,Trabajo autónomo,Datos Temáticos,4.7
+2025-04-06,Ninfa Carolina Menjura,Reuniones,Mapa de Referencia,3.7
+2025-04-06,Yair Morales,Trabajo autónomo,Análisis de Datos,5.4
+2025-04-06,Yair Morales,Reuniones,Datos Temáticos,3.8
+2025-04-06,Daniel Gonzalez,Trabajo autónomo,Cartografía,7.0
+2025-04-06,Diana Carvajal,Trabajo autónomo,Mapa de Referencia,7.6
+2025-04-06,Diana Carvajal,Reuniones,Mapa de Referencia,3.5
+2025-04-06,Diego Marin,Trabajo autónomo,Datos Temáticos,3.6
+2025-04-06,Diego Marin,Reuniones,Datos Temáticos,3.2
+2025-04-06,Jairo Perdomo,Trabajo autónomo,Cartografía,2.0
+2025-04-06,Laura Rodríguez,Trabajo autónomo,Análisis de Datos,1.2
+2025-04-06,Luz Carolina Galvis,Reuniones,Cartografía,1.8
+2025-04-06,Maria Bernate,Trabajo autónomo,Cartografía,5.6
+2025-04-06,Maria Bernate,Reuniones,Datos Temáticos,7.8
+2025-04-06,Martha Vargas,Reuniones,Análisis de Datos,3.3
+2025-04-07,Cesar Ramirez,Trabajo autónomo,Cartografía,2.6
+2025-04-07,Cristian Martínez,Trabajo autónomo,Cartografía,5.7
+2025-04-07,Cristian Martínez,Reuniones,Análisis de Datos,1.6
+2025-04-07,Nestor Roldan,Reuniones,Datos Temáticos,8.0
+2025-04-07,Hernan Bernal,Reuniones,Análisis de Datos,2.0
+2025-04-07,Daniel Morales,Trabajo autónomo,Datos Temáticos,3.4
+2025-04-07,Daniel Morales,Reuniones,Datos Temáticos,2.3
+2025-04-07,Leila Awad,Trabajo autónomo,Análisis de Datos,4.2
+2025-04-07,Leila Awad,Reuniones,Análisis de Datos,7.3
+2025-04-07,Ninfa Carolina Menjura,Reuniones,Análisis de Datos,6.2
+2025-04-07,Yair Morales,Trabajo autónomo,Datos Temáticos,2.0
+2025-04-07,Daniel Gonzalez,Trabajo autónomo,Mapa de Referencia,5.6
+2025-04-07,Daniel Gonzalez,Reuniones,Cartografía,2.3
+2025-04-07,Diana Carvajal,Reuniones,Análisis de Datos,4.8
+2025-04-07,Diego Marin,Reuniones,Datos Temáticos,5.7
+2025-04-07,Jairo Perdomo,Trabajo autónomo,Mapa de Referencia,5.3
+2025-04-07,Jairo Perdomo,Reuniones,Análisis de Datos,6.1
+2025-04-07,Laura Rodríguez,Reuniones,Cartografía,2.3
+2025-04-07,Luz Carolina Galvis,Reuniones,Mapa de Referencia,8.0
+2025-04-07,Maria Bernate,Reuniones,Datos Temáticos,6.0
+2025-04-07,Martha Vargas,Trabajo autónomo,Datos Temáticos,6.5
+2025-04-07,Martha Vargas,Reuniones,Análisis de Datos,5.2
+2025-04-08,Cesar Ramirez,Reuniones,Mapa de Referencia,7.1
+2025-04-08,Cristian Martínez,Trabajo autónomo,Datos Temáticos,7.5
+2025-04-08,Cristian Martínez,Reuniones,Análisis de Datos,1.1
+2025-04-08,Nestor Roldan,Trabajo autónomo,Cartografía,7.2
+2025-04-08,Hernan Bernal,Trabajo autónomo,Datos Temáticos,2.3
+2025-04-08,Hernan Bernal,Reuniones,Análisis de Datos,2.6
+2025-04-08,Daniel Morales,Trabajo autónomo,Datos Temáticos,7.4
+2025-04-08,Leila Awad,Trabajo autónomo,Datos Temáticos,7.1
+2025-04-08,Leila Awad,Reuniones,Mapa de Referencia,4.7
+2025-04-08,Ninfa Carolina Menjura,Trabajo autónomo,Cartografía,7.3
+2025-04-08,Ninfa Carolina Menjura,Reuniones,Mapa de Referencia,6.6
+2025-04-08,Yair Morales,Reuniones,Análisis de Datos,6.5
+2025-04-08,Daniel Gonzalez,Reuniones,Mapa de Referencia,6.8
+2025-04-08,Diana Carvajal,Reuniones,Mapa de Referencia,1.8
+2025-04-08,Diego Marin,Trabajo autónomo,Datos Temáticos,2.8
+2025-04-08,Diego Marin,Reuniones,Análisis de Datos,6.2
+2025-04-08,Jairo Perdomo,Trabajo autónomo,Cartografía,5.5
+2025-04-08,Jairo Perdomo,Reuniones,Análisis de Datos,5.6
+2025-04-08,Laura Rodríguez,Trabajo autónomo,Mapa de Referencia,3.6
+2025-04-08,Laura Rodríguez,Reuniones,Cartografía,1.1
+2025-04-08,Luz Carolina Galvis,Trabajo autónomo,Mapa de Referencia,5.3
+2025-04-08,Maria Bernate,Reuniones,Cartografía,4.6
+2025-04-08,Martha Vargas,Trabajo autónomo,Cartografía,6.3
+2025-04-08,Martha Vargas,Reuniones,Mapa de Referencia,2.1
+2025-04-09,Cesar Ramirez,Trabajo autónomo,Cartografía,7.5
+2025-04-09,Cristian Martínez,Trabajo autónomo,Datos Temáticos,7.4
+2025-04-09,Cristian Martínez,Reuniones,Análisis de Datos,2.1
+2025-04-09,Nestor Roldan,Reuniones,Cartografía,6.3
+2025-04-09,Hernan Bernal,Trabajo autónomo,Cartografía,1.7
+2025-04-09,Daniel Morales,Trabajo autónomo,Cartografía,3.4
+2025-04-09,Daniel Morales,Reuniones,Mapa de Referencia,1.7
+2025-04-09,Leila Awad,Reuniones,Mapa de Referencia,3.5
+2025-04-09,Ninfa Carolina Menjura,Reuniones,Análisis de Datos,2.3
+2025-04-09,Yair Morales,Trabajo autónomo,Cartografía,2.6
+2025-04-09,Yair Morales,Reuniones,Cartografía,1.3
+2025-04-09,Daniel Gonzalez,Reuniones,Análisis de Datos,1.9
+2025-04-09,Diana Carvajal,Reuniones,Cartografía,6.6
+2025-04-09,Diego Marin,Trabajo autónomo,Mapa de Referencia,3.4
+2025-04-09,Diego Marin,Reuniones,Cartografía,2.0
+2025-04-09,Jairo Perdomo,Trabajo autónomo,Datos Temáticos,2.5
+2025-04-09,Jairo Perdomo,Reuniones,Análisis de Datos,6.5
+2025-04-09,Luz Carolina Galvis,Trabajo autónomo,Cartografía,6.9
+2025-04-09,Maria Bernate,Trabajo autónomo,Mapa de Referencia,6.3
+2025-04-09,Maria Bernate,Reuniones,Análisis de Datos,6.2
+2025-04-10,Cesar Ramirez,Reuniones,Mapa de Referencia,4.5
+2025-04-10,Nestor Roldan,Trabajo autónomo,Mapa de Referencia,6.3
+2025-04-10,Nestor Roldan,Reuniones,Análisis de Datos,7.1
+2025-04-10,Hernan Bernal,Trabajo autónomo,Datos Temáticos,1.0
+2025-04-10,Hernan Bernal,Reuniones,Mapa de Referencia,5.9
+2025-04-10,Daniel Morales,Reuniones,Mapa de Referencia,2.0
+2025-04-10,Leila Awad,Trabajo autónomo,Datos Temáticos,1.6
+2025-04-10,Leila Awad,Reuniones,Análisis de Datos,3.2
+2025-04-10,Ninfa Carolina Menjura,Trabajo autónomo,Análisis de Datos,5.0
+2025-04-10,Ninfa Carolina Menjura,Reuniones,Análisis de Datos,6.1
+2025-04-10,Yair Morales,Reuniones,Mapa de Referencia,3.1
+2025-04-10,Daniel Gonzalez,Trabajo autónomo,Cartografía,6.4
+2025-04-10,Diana Carvajal,Trabajo autónomo,Análisis de Datos,6.8
+2025-04-10,Diana Carvajal,Reuniones,Datos Temáticos,7.4
+2025-04-10,Diego Marin,Trabajo autónomo,Cartografía,6.1
+2025-04-10,Diego Marin,Reuniones,Cartografía,1.2
+2025-04-10,Jairo Perdomo,Trabajo autónomo,Datos Temáticos,1.7
+2025-04-10,Jairo Perdomo,Reuniones,Mapa de Referencia,3.3
+2025-04-10,Laura Rodríguez,Trabajo autónomo,Datos Temáticos,2.1
+2025-04-10,Laura Rodríguez,Reuniones,Mapa de Referencia,3.4
+2025-04-10,Luz Carolina Galvis,Reuniones,Datos Temáticos,1.9
+2025-04-10,Maria Bernate,Trabajo autónomo,Análisis de Datos,4.5
+2025-04-10,Maria Bernate,Reuniones,Mapa de Referencia,1.9
+2025-04-10,Martha Vargas,Reuniones,Mapa de Referencia,7.3
+2025-04-11,Cesar Ramirez,Reuniones,Análisis de Datos,1.3
+2025-04-11,Cristian Martínez,Trabajo autónomo,Datos Temáticos,1.5
+2025-04-11,Cristian Martínez,Reuniones,Cartografía,4.1
+2025-04-11,Nestor Roldan,Reuniones,Mapa de Referencia,4.8
+2025-04-11,Hernan Bernal,Trabajo autónomo,Análisis de Datos,6.2
+2025-04-11,Daniel Morales,Trabajo autónomo,Cartografía,2.8
+2025-04-11,Daniel Morales,Reuniones,Mapa de Referencia,7.9
+2025-04-11,Leila Awad,Trabajo autónomo,Cartografía,2.1
+2025-04-11,Leila Awad,Reuniones,Mapa de Referencia,7.8
+2025-04-11,Ninfa Carolina Menjura,Trabajo autónomo,Mapa de Referencia,5.4
+2025-04-11,Ninfa Carolina Menjura,Reuniones,Datos Temáticos,4.8
+2025-04-11,Daniel Gonzalez,Trabajo autónomo,Datos Temáticos,2.1
+2025-04-11,Daniel Gonzalez,Reuniones,Cartografía,1.4
+2025-04-11,Diana Carvajal,Reuniones,Mapa de Referencia,1.4
+2025-04-11,Diego Marin,Trabajo autónomo,Cartografía,7.8
+2025-04-11,Diego Marin,Reuniones,Datos Temáticos,4.6
+2025-04-11,Jairo Perdomo,Trabajo autónomo,Mapa de Referencia,7.4
+2025-04-11,Jairo Perdomo,Reuniones,Análisis de Datos,1.3
+2025-04-11,Laura Rodríguez,Trabajo autónomo,Datos Temáticos,4.0
+2025-04-11,Laura Rodríguez,Reuniones,Análisis de Datos,3.8
+2025-04-11,Luz Carolina Galvis,Trabajo autónomo,Cartografía,2.6
+2025-04-11,Luz Carolina Galvis,Reuniones,Mapa de Referencia,3.4
+2025-04-11,Martha Vargas,Trabajo autónomo,Datos Temáticos,3.6
+2025-04-12,Cesar Ramirez,Reuniones,Datos Temáticos,7.7
+2025-04-12,Cristian Martínez,Trabajo autónomo,Datos Temáticos,5.5
+2025-04-12,Cristian Martínez,Reuniones,Cartografía,2.1
+2025-04-12,Nestor Roldan,Trabajo autónomo,Datos Temáticos,7.2
+2025-04-12,Nestor Roldan,Reuniones,Datos Temáticos,5.0
+2025-04-12,Hernan Bernal,Trabajo autónomo,Mapa de Referencia,3.3
+2025-04-12,Hernan Bernal,Reuniones,Análisis de Datos,3.6
+2025-04-12,Daniel Morales,Trabajo autónomo,Cartografía,3.0
+2025-04-12,Daniel Morales,Reuniones,Mapa de Referencia,3.9
+2025-04-12,Leila Awad,Trabajo autónomo,Cartografía,7.5
+2025-04-12,Leila Awad,Reuniones,Mapa de Referencia,5.4
+2025-04-12,Ninfa Carolina Menjura,Trabajo autónomo,Análisis de Datos,1.2
+2025-04-12,Daniel Gonzalez,Trabajo autónomo,Datos Temáticos,5.4
+2025-04-12,Daniel Gonzalez,Reuniones,Datos Temáticos,3.2
+2025-04-12,Diana Carvajal,Trabajo autónomo,Análisis de Datos,5.6
+2025-04-12,Diana Carvajal,Reuniones,Datos Temáticos,6.7
+2025-04-12,Diego Marin,Trabajo autónomo,Mapa de Referencia,4.6
+2025-04-12,Diego Marin,Reuniones,Datos Temáticos,5.9
+2025-04-12,Jairo Perdomo,Trabajo autónomo,Cartografía,1.3
+2025-04-12,Laura Rodríguez,Trabajo autónomo,Datos Temáticos,1.0
+2025-04-12,Laura Rodríguez,Reuniones,Mapa de Referencia,3.2
+2025-04-12,Luz Carolina Galvis,Reuniones,Análisis de Datos,6.1
+2025-04-12,Maria Bernate,Trabajo autónomo,Cartografía,2.8
+2025-04-12,Maria Bernate,Reuniones,Mapa de Referencia,3.9
+2025-04-12,Martha Vargas,Trabajo autónomo,Datos Temáticos,6.0
+2025-04-13,Cesar Ramirez,Trabajo autónomo,Mapa de Referencia,7.6
+2025-04-13,Cesar Ramirez,Reuniones,Análisis de Datos,7.9
+2025-04-13,Cristian Martínez,Trabajo autónomo,Análisis de Datos,7.9
+2025-04-13,Nestor Roldan,Trabajo autónomo,Análisis de Datos,7.4
+2025-04-13,Hernan Bernal,Trabajo autónomo,Cartografía,6.7
+2025-04-13,Hernan Bernal,Reuniones,Mapa de Referencia,7.8
+2025-04-13,Daniel Morales,Reuniones,Datos Temáticos,5.6
+2025-04-13,Leila Awad,Trabajo autónomo,Cartografía,4.4
+2025-04-13,Leila Awad,Reuniones,Análisis de Datos,4.3
+2025-04-13,Ninfa Carolina Menjura,Trabajo autónomo,Mapa de Referencia,3.6
+2025-04-13,Ninfa Carolina Menjura,Reuniones,Mapa de Referencia,1.2
+2025-04-13,Yair Morales,Trabajo autónomo,Datos Temáticos,1.4
+2025-04-13,Yair Morales,Reuniones,Datos Temáticos,6.2
+2025-04-13,Daniel Gonzalez,Trabajo autónomo,Cartografía,5.7
+2025-04-13,Daniel Gonzalez,Reuniones,Mapa de Referencia,4.2
+2025-04-13,Diana Carvajal,Trabajo autónomo,Análisis de Datos,2.3
+2025-04-13,Diana Carvajal,Reuniones,Mapa de Referencia,1.8
+2025-04-13,Diego Marin,Trabajo autónomo,Mapa de Referencia,8.0
+2025-04-13,Diego Marin,Reuniones,Mapa de Referencia,5.6
+2025-04-13,Jairo Perdomo,Trabajo autónomo,Datos Temáticos,5.6
+2025-04-13,Luz Carolina Galvis,Reuniones,Análisis de Datos,3.7
+2025-04-13,Maria Bernate,Trabajo autónomo,Cartografía,3.3
+2025-04-13,Maria Bernate,Reuniones,Datos Temáticos,3.9
+2025-04-13,Martha Vargas,Trabajo autónomo,Análisis de Datos,2.6
+2025-04-14,Cesar Ramirez,Reuniones,Datos Temáticos,3.4
+2025-04-14,Cristian Martínez,Reuniones,Datos Temáticos,2.4
+2025-04-14,Nestor Roldan,Trabajo autónomo,Mapa de Referencia,3.9
+2025-04-14,Nestor Roldan,Reuniones,Datos Temáticos,5.5
+2025-04-14,Daniel Morales,Trabajo autónomo,Análisis de Datos,6.7
+2025-04-14,Leila Awad,Trabajo autónomo,Mapa de Referencia,2.6
+2025-04-14,Leila Awad,Reuniones,Mapa de Referencia,5.6
+2025-04-14,Ninfa Carolina Menjura,Reuniones,Análisis de Datos,3.4
+2025-04-14,Yair Morales,Trabajo autónomo,Mapa de Referencia,4.5
+2025-04-14,Daniel Gonzalez,Reuniones,Mapa de Referencia,4.3
+2025-04-14,Diana Carvajal,Trabajo autónomo,Datos Temáticos,4.8
+2025-04-14,Diego Marin,Trabajo autónomo,Cartografía,2.4
+2025-04-14,Diego Marin,Reuniones,Cartografía,3.6
+2025-04-14,Jairo Perdomo,Trabajo autónomo,Cartografía,5.5
+2025-04-14,Laura Rodríguez,Reuniones,Mapa de Referencia,5.7
+2025-04-14,Luz Carolina Galvis,Reuniones,Mapa de Referencia,6.3
+2025-04-14,Maria Bernate,Trabajo autónomo,Análisis de Datos,6.5
+2025-04-14,Maria Bernate,Reuniones,Mapa de Referencia,2.2
+2025-04-14,Martha Vargas,Reuniones,Mapa de Referencia,1.2
+2025-04-15,Cesar Ramirez,Trabajo autónomo,Mapa de Referencia,2.4
+2025-04-15,Cesar Ramirez,Reuniones,Análisis de Datos,4.2
+2025-04-15,Cristian Martínez,Trabajo autónomo,Mapa de Referencia,7.6
+2025-04-15,Nestor Roldan,Reuniones,Cartografía,1.9
+2025-04-15,Daniel Morales,Trabajo autónomo,Mapa de Referencia,5.8
+2025-04-15,Leila Awad,Trabajo autónomo,Análisis de Datos,1.3
+2025-04-15,Leila Awad,Reuniones,Mapa de Referencia,6.3
+2025-04-15,Ninfa Carolina Menjura,Trabajo autónomo,Análisis de Datos,4.5
+2025-04-15,Ninfa Carolina Menjura,Reuniones,Análisis de Datos,4.2
+2025-04-15,Yair Morales,Trabajo autónomo,Mapa de Referencia,3.7
+2025-04-15,Yair Morales,Reuniones,Análisis de Datos,1.3
+2025-04-15,Daniel Gonzalez,Reuniones,Análisis de Datos,3.8
+2025-04-15,Diana Carvajal,Trabajo autónomo,Cartografía,6.5
+2025-04-15,Diego Marin,Trabajo autónomo,Cartografía,2.3
+2025-04-15,Diego Marin,Reuniones,Mapa de Referencia,7.3
+2025-04-15,Jairo Perdomo,Trabajo autónomo,Cartografía,4.8
+2025-04-15,Jairo Perdomo,Reuniones,Cartografía,3.1
+2025-04-15,Laura Rodríguez,Reuniones,Cartografía,7.5
+2025-04-15,Luz Carolina Galvis,Reuniones,Cartografía,7.8
+2025-04-15,Martha Vargas,Trabajo autónomo,Cartografía,1.9
+2025-04-15,Martha Vargas,Reuniones,Cartografía,3.8
+2025-04-16,Cesar Ramirez,Trabajo autónomo,Datos Temáticos,1.4
+2025-04-16,Cesar Ramirez,Reuniones,Mapa de Referencia,2.6
+2025-04-16,Cristian Martínez,Trabajo autónomo,Análisis de Datos,6.4
+2025-04-16,Cristian Martínez,Reuniones,Análisis de Datos,1.7
+2025-04-16,Hernan Bernal,Reuniones,Mapa de Referencia,6.1
+2025-04-16,Daniel Morales,Trabajo autónomo,Mapa de Referencia,7.8
+2025-04-16,Daniel Morales,Reuniones,Datos Temáticos,1.0
+2025-04-16,Leila Awad,Trabajo autónomo,Datos Temáticos,6.4
+2025-04-16,Leila Awad,Reuniones,Cartografía,3.4
+2025-04-16,Ninfa Carolina Menjura,Trabajo autónomo,Datos Temáticos,4.1
+2025-04-16,Yair Morales,Trabajo autónomo,Cartografía,1.6
+2025-04-16,Yair Morales,Reuniones,Mapa de Referencia,7.0
+2025-04-16,Daniel Gonzalez,Reuniones,Datos Temáticos,7.6
+2025-04-16,Diana Carvajal,Trabajo autónomo,Datos Temáticos,4.4
+2025-04-16,Diana Carvajal,Reuniones,Mapa de Referencia,6.5
+2025-04-16,Diego Marin,Reuniones,Análisis de Datos,7.0
+2025-04-16,Jairo Perdomo,Reuniones,Datos Temáticos,5.3
+2025-04-16,Luz Carolina Galvis,Trabajo autónomo,Análisis de Datos,1.6
+2025-04-16,Luz Carolina Galvis,Reuniones,Cartografía,6.1
+2025-04-16,Maria Bernate,Trabajo autónomo,Análisis de Datos,7.5
+2025-04-16,Maria Bernate,Reuniones,Datos Temáticos,3.9
+2025-04-16,Martha Vargas,Trabajo autónomo,Análisis de Datos,3.0
+2025-04-16,Martha Vargas,Reuniones,Datos Temáticos,4.5
+2025-04-17,Cesar Ramirez,Trabajo autónomo,Mapa de Referencia,3.0
+2025-04-17,Cesar Ramirez,Reuniones,Datos Temáticos,1.5
+2025-04-17,Nestor Roldan,Trabajo autónomo,Datos Temáticos,7.4
+2025-04-17,Nestor Roldan,Reuniones,Análisis de Datos,7.1
+2025-04-17,Hernan Bernal,Trabajo autónomo,Mapa de Referencia,5.3
+2025-04-17,Leila Awad,Trabajo autónomo,Cartografía,1.0
+2025-04-17,Ninfa Carolina Menjura,Trabajo autónomo,Cartografía,7.2
+2025-04-17,Yair Morales,Trabajo autónomo,Análisis de Datos,7.4
+2025-04-17,Yair Morales,Reuniones,Análisis de Datos,1.4
+2025-04-17,Daniel Gonzalez,Trabajo autónomo,Cartografía,3.2
+2025-04-17,Daniel Gonzalez,Reuniones,Análisis de Datos,4.7
+2025-04-17,Diana Carvajal,Trabajo autónomo,Mapa de Referencia,2.5
+2025-04-17,Diana Carvajal,Reuniones,Análisis de Datos,4.3
+2025-04-17,Diego Marin,Trabajo autónomo,Análisis de Datos,3.5
+2025-04-17,Diego Marin,Reuniones,Datos Temáticos,4.0
+2025-04-17,Laura Rodríguez,Trabajo autónomo,Análisis de Datos,4.9
+2025-04-17,Laura Rodríguez,Reuniones,Datos Temáticos,4.2
+2025-04-17,Luz Carolina Galvis,Trabajo autónomo,Cartografía,7.4
+2025-04-17,Maria Bernate,Reuniones,Mapa de Referencia,1.7
+2025-04-17,Martha Vargas,Reuniones,Análisis de Datos,1.8
+2025-04-18,Cesar Ramirez,Trabajo autónomo,Cartografía,7.2
+2025-04-18,Cesar Ramirez,Reuniones,Análisis de Datos,2.1
+2025-04-18,Cristian Martínez,Trabajo autónomo,Cartografía,2.0
+2025-04-18,Nestor Roldan,Reuniones,Análisis de Datos,2.4
+2025-04-18,Hernan Bernal,Reuniones,Datos Temáticos,6.4
+2025-04-18,Daniel Morales,Reuniones,Datos Temáticos,2.7
+2025-04-18,Leila Awad,Trabajo autónomo,Análisis de Datos,4.5
+2025-04-18,Leila Awad,Reuniones,Análisis de Datos,3.6
+2025-04-18,Ninfa Carolina Menjura,Trabajo autónomo,Cartografía,7.4
+2025-04-18,Ninfa Carolina Menjura,Reuniones,Análisis de Datos,2.8
+2025-04-18,Yair Morales,Reuniones,Análisis de Datos,6.5
+2025-04-18,Daniel Gonzalez,Trabajo autónomo,Cartografía,7.2
+2025-04-18,Daniel Gonzalez,Reuniones,Datos Temáticos,5.8
+2025-04-18,Diana Carvajal,Reuniones,Cartografía,7.3
+2025-04-18,Diego Marin,Reuniones,Datos Temáticos,7.2
+2025-04-18,Jairo Perdomo,Reuniones,Cartografía,5.0
+2025-04-18,Laura Rodríguez,Reuniones,Datos Temáticos,4.8
+2025-04-18,Luz Carolina Galvis,Trabajo autónomo,Análisis de Datos,1.2
+2025-04-18,Maria Bernate,Trabajo autónomo,Análisis de Datos,5.8
+2025-04-18,Maria Bernate,Reuniones,Cartografía,4.8
+2025-04-18,Martha Vargas,Trabajo autónomo,Análisis de Datos,5.9
+2025-04-18,Martha Vargas,Reuniones,Cartografía,2.9
+2025-04-19,Cesar Ramirez,Reuniones,Cartografía,7.4
+2025-04-19,Cristian Martínez,Trabajo autónomo,Mapa de Referencia,3.4
+2025-04-19,Nestor Roldan,Trabajo autónomo,Análisis de Datos,3.8
+2025-04-19,Hernan Bernal,Trabajo autónomo,Mapa de Referencia,1.0
+2025-04-19,Hernan Bernal,Reuniones,Análisis de Datos,2.1
+2025-04-19,Daniel Morales,Reuniones,Datos Temáticos,1.8
+2025-04-19,Ninfa Carolina Menjura,Trabajo autónomo,Análisis de Datos,4.2
+2025-04-19,Yair Morales,Trabajo autónomo,Cartografía,5.5
+2025-04-19,Daniel Gonzalez,Reuniones,Análisis de Datos,1.3
+2025-04-19,Diego Marin,Trabajo autónomo,Datos Temáticos,7.9
+2025-04-19,Diego Marin,Reuniones,Datos Temáticos,6.9
+2025-04-19,Laura Rodríguez,Reuniones,Mapa de Referencia,1.9
+2025-04-19,Luz Carolina Galvis,Trabajo autónomo,Datos Temáticos,1.4
+2025-04-19,Luz Carolina Galvis,Reuniones,Mapa de Referencia,4.4
+2025-04-19,Maria Bernate,Trabajo autónomo,Análisis de Datos,1.7
+2025-04-19,Maria Bernate,Reuniones,Análisis de Datos,4.4
+2025-04-19,Martha Vargas,Trabajo autónomo,Mapa de Referencia,4.3
+2025-04-19,Martha Vargas,Reuniones,Mapa de Referencia,5.0
+2025-04-20,Cesar Ramirez,Trabajo autónomo,Análisis de Datos,3.4
+2025-04-20,Cesar Ramirez,Reuniones,Análisis de Datos,2.3
+2025-04-20,Cristian Martínez,Trabajo autónomo,Cartografía,5.2
+2025-04-20,Cristian Martínez,Reuniones,Cartografía,4.4
+2025-04-20,Nestor Roldan,Trabajo autónomo,Cartografía,7.2
+2025-04-20,Nestor Roldan,Reuniones,Cartografía,4.2
+2025-04-20,Hernan Bernal,Trabajo autónomo,Mapa de Referencia,6.8
+2025-04-20,Hernan Bernal,Reuniones,Cartografía,3.7
+2025-04-20,Daniel Morales,Reuniones,Mapa de Referencia,1.1
+2025-04-20,Leila Awad,Trabajo autónomo,Cartografía,3.1
+2025-04-20,Ninfa Carolina Menjura,Trabajo autónomo,Datos Temáticos,7.1
+2025-04-20,Ninfa Carolina Menjura,Reuniones,Análisis de Datos,7.9
+2025-04-20,Yair Morales,Trabajo autónomo,Mapa de Referencia,2.9
+2025-04-20,Yair Morales,Reuniones,Mapa de Referencia,6.9
+2025-04-20,Daniel Gonzalez,Trabajo autónomo,Datos Temáticos,7.8
+2025-04-20,Daniel Gonzalez,Reuniones,Mapa de Referencia,1.7
+2025-04-20,Diana Carvajal,Trabajo autónomo,Análisis de Datos,1.4
+2025-04-20,Diana Carvajal,Reuniones,Análisis de Datos,6.2
+2025-04-20,Diego Marin,Trabajo autónomo,Análisis de Datos,2.6
+2025-04-20,Diego Marin,Reuniones,Análisis de Datos,1.0
+2025-04-20,Jairo Perdomo,Trabajo autónomo,Datos Temáticos,5.7
+2025-04-20,Jairo Perdomo,Reuniones,Datos Temáticos,3.0
+2025-04-20,Laura Rodríguez,Trabajo autónomo,Datos Temáticos,2.6
+2025-04-20,Luz Carolina Galvis,Trabajo autónomo,Cartografía,2.9
+2025-04-20,Luz Carolina Galvis,Reuniones,Mapa de Referencia,7.1
+2025-04-20,Maria Bernate,Reuniones,Datos Temáticos,4.2
+2025-04-20,Martha Vargas,Trabajo autónomo,Datos Temáticos,1.7
+2025-04-20,Martha Vargas,Reuniones,Datos Temáticos,3.2
+2025-04-21,Cesar Ramirez,Reuniones,Mapa de Referencia,3.5
+2025-04-21,Cristian Martínez,Trabajo autónomo,Mapa de Referencia,2.6
+2025-04-21,Nestor Roldan,Trabajo autónomo,Datos Temáticos,3.8
+2025-04-21,Nestor Roldan,Reuniones,Análisis de Datos,1.3
+2025-04-21,Hernan Bernal,Trabajo autónomo,Análisis de Datos,5.1
+2025-04-21,Hernan Bernal,Reuniones,Análisis de Datos,5.6
+2025-04-21,Daniel Morales,Trabajo autónomo,Mapa de Referencia,5.5
+2025-04-21,Daniel Morales,Reuniones,Mapa de Referencia,6.7
+2025-04-21,Leila Awad,Reuniones,Cartografía,5.9
+2025-04-21,Ninfa Carolina Menjura,Trabajo autónomo,Análisis de Datos,7.3
+2025-04-21,Ninfa Carolina Menjura,Reuniones,Cartografía,1.6
+2025-04-21,Yair Morales,Trabajo autónomo,Cartografía,5.0
+2025-04-21,Yair Morales,Reuniones,Cartografía,6.2
+2025-04-21,Diana Carvajal,Trabajo autónomo,Datos Temáticos,1.8
+2025-04-21,Diana Carvajal,Reuniones,Análisis de Datos,3.5
+2025-04-21,Diego Marin,Trabajo autónomo,Cartografía,1.9
+2025-04-21,Diego Marin,Reuniones,Datos Temáticos,6.9
+2025-04-21,Jairo Perdomo,Trabajo autónomo,Cartografía,6.6
+2025-04-21,Jairo Perdomo,Reuniones,Cartografía,4.4
+2025-04-21,Laura Rodríguez,Trabajo autónomo,Análisis de Datos,5.2
+2025-04-21,Laura Rodríguez,Reuniones,Mapa de Referencia,6.8
+2025-04-21,Luz Carolina Galvis,Trabajo autónomo,Cartografía,7.9
+2025-04-21,Luz Carolina Galvis,Reuniones,Mapa de Referencia,7.5
+2025-04-21,Maria Bernate,Trabajo autónomo,Datos Temáticos,2.4
+2025-04-21,Maria Bernate,Reuniones,Cartografía,3.2
+2025-04-21,Martha Vargas,Reuniones,Análisis de Datos,5.9
+2025-04-22,Cesar Ramirez,Trabajo autónomo,Datos Temáticos,7.7
+2025-04-22,Cristian Martínez,Trabajo autónomo,Cartografía,6.3
+2025-04-22,Cristian Martínez,Reuniones,Datos Temáticos,6.1
+2025-04-22,Nestor Roldan,Trabajo autónomo,Mapa de Referencia,2.6
+2025-04-22,Nestor Roldan,Reuniones,Análisis de Datos,2.7
+2025-04-22,Hernan Bernal,Trabajo autónomo,Análisis de Datos,1.7
+2025-04-22,Hernan Bernal,Reuniones,Análisis de Datos,5.6
+2025-04-22,Daniel Morales,Trabajo autónomo,Datos Temáticos,2.8
+2025-04-22,Daniel Morales,Reuniones,Datos Temáticos,4.8
+2025-04-22,Leila Awad,Trabajo autónomo,Análisis de Datos,5.4
+2025-04-22,Leila Awad,Reuniones,Análisis de Datos,4.1
+2025-04-22,Ninfa Carolina Menjura,Reuniones,Cartografía,2.5
+2025-04-22,Yair Morales,Trabajo autónomo,Cartografía,2.9
+2025-04-22,Daniel Gonzalez,Trabajo autónomo,Mapa de Referencia,2.1
+2025-04-22,Daniel Gonzalez,Reuniones,Análisis de Datos,5.7
+2025-04-22,Diana Carvajal,Trabajo autónomo,Análisis de Datos,7.2
+2025-04-22,Diana Carvajal,Reuniones,Datos Temáticos,2.7
+2025-04-22,Diego Marin,Trabajo autónomo,Análisis de Datos,6.1
+2025-04-22,Diego Marin,Reuniones,Mapa de Referencia,2.0
+2025-04-22,Jairo Perdomo,Trabajo autónomo,Análisis de Datos,7.6
+2025-04-22,Jairo Perdomo,Reuniones,Análisis de Datos,3.5
+2025-04-22,Laura Rodríguez,Trabajo autónomo,Mapa de Referencia,2.6
+2025-04-22,Laura Rodríguez,Reuniones,Análisis de Datos,1.3
+2025-04-22,Luz Carolina Galvis,Trabajo autónomo,Datos Temáticos,1.9
+2025-04-22,Luz Carolina Galvis,Reuniones,Cartografía,4.0
+2025-04-22,Maria Bernate,Trabajo autónomo,Análisis de Datos,3.9
+2025-04-22,Maria Bernate,Reuniones,Cartografía,1.5
+2025-04-22,Martha Vargas,Trabajo autónomo,Datos Temáticos,3.0
+2025-04-22,Martha Vargas,Reuniones,Análisis de Datos,3.1
+2025-04-23,Cesar Ramirez,Reuniones,Cartografía,2.1
+2025-04-23,Cristian Martínez,Trabajo autónomo,Cartografía,3.2
+2025-04-23,Nestor Roldan,Reuniones,Cartografía,5.3
+2025-04-23,Hernan Bernal,Trabajo autónomo,Análisis de Datos,6.4
+2025-04-23,Hernan Bernal,Reuniones,Datos Temáticos,2.2
+2025-04-23,Leila Awad,Trabajo autónomo,Análisis de Datos,1.9
+2025-04-23,Leila Awad,Reuniones,Análisis de Datos,4.9
+2025-04-23,Yair Morales,Trabajo autónomo,Análisis de Datos,5.6
+2025-04-23,Yair Morales,Reuniones,Mapa de Referencia,3.9
+2025-04-23,Daniel Gonzalez,Trabajo autónomo,Cartografía,4.7
+2025-04-23,Daniel Gonzalez,Reuniones,Mapa de Referencia,2.1
+2025-04-23,Diana Carvajal,Reuniones,Análisis de Datos,8.0
+2025-04-23,Jairo Perdomo,Reuniones,Cartografía,1.6
+2025-04-23,Laura Rodríguez,Trabajo autónomo,Análisis de Datos,7.1
+2025-04-23,Luz Carolina Galvis,Trabajo autónomo,Cartografía,4.2
+2025-04-23,Luz Carolina Galvis,Reuniones,Datos Temáticos,1.6
+2025-04-23,Maria Bernate,Trabajo autónomo,Análisis de Datos,6.3
+2025-04-23,Maria Bernate,Reuniones,Análisis de Datos,4.2
+2025-04-23,Martha Vargas,Reuniones,Mapa de Referencia,2.8
+2025-04-24,Cesar Ramirez,Trabajo autónomo,Datos Temáticos,3.0
+2025-04-24,Cesar Ramirez,Reuniones,Mapa de Referencia,4.3
+2025-04-24,Cristian Martínez,Trabajo autónomo,Datos Temáticos,6.1
+2025-04-24,Cristian Martínez,Reuniones,Análisis de Datos,1.6
+2025-04-24,Nestor Roldan,Trabajo autónomo,Datos Temáticos,1.7
+2025-04-24,Nestor Roldan,Reuniones,Mapa de Referencia,5.1
+2025-04-24,Hernan Bernal,Trabajo autónomo,Mapa de Referencia,4.3
+2025-04-24,Daniel Morales,Trabajo autónomo,Mapa de Referencia,7.5
+2025-04-24,Daniel Morales,Reuniones,Cartografía,1.2
+2025-04-24,Leila Awad,Trabajo autónomo,Cartografía,2.2
+2025-04-24,Yair Morales,Trabajo autónomo,Mapa de Referencia,4.4
+2025-04-24,Yair Morales,Reuniones,Mapa de Referencia,1.6
+2025-04-24,Daniel Gonzalez,Trabajo autónomo,Datos Temáticos,4.3
+2025-04-24,Daniel Gonzalez,Reuniones,Cartografía,5.7
+2025-04-24,Diana Carvajal,Trabajo autónomo,Análisis de Datos,6.3
+2025-04-24,Diana Carvajal,Reuniones,Datos Temáticos,1.7
+2025-04-24,Diego Marin,Trabajo autónomo,Cartografía,8.0
+2025-04-24,Diego Marin,Reuniones,Análisis de Datos,7.7
+2025-04-24,Laura Rodríguez,Reuniones,Cartografía,7.4
+2025-04-24,Luz Carolina Galvis,Reuniones,Mapa de Referencia,4.1
+2025-04-24,Maria Bernate,Trabajo autónomo,Datos Temáticos,5.8
+2025-04-24,Maria Bernate,Reuniones,Datos Temáticos,1.5
+2025-04-24,Martha Vargas,Trabajo autónomo,Mapa de Referencia,1.5
+2025-04-24,Martha Vargas,Reuniones,Cartografía,4.4
+2025-04-25,Cesar Ramirez,Reuniones,Mapa de Referencia,4.2
+2025-04-25,Cristian Martínez,Trabajo autónomo,Datos Temáticos,6.4
+2025-04-25,Nestor Roldan,Trabajo autónomo,Análisis de Datos,3.4
+2025-04-25,Nestor Roldan,Reuniones,Cartografía,4.8
+2025-04-25,Hernan Bernal,Reuniones,Mapa de Referencia,6.3
+2025-04-25,Daniel Morales,Trabajo autónomo,Datos Temáticos,4.2
+2025-04-25,Daniel Morales,Reuniones,Análisis de Datos,7.5
+2025-04-25,Leila Awad,Trabajo autónomo,Análisis de Datos,2.9
+2025-04-25,Leila Awad,Reuniones,Mapa de Referencia,5.4
+2025-04-25,Ninfa Carolina Menjura,Trabajo autónomo,Análisis de Datos,7.3
+2025-04-25,Ninfa Carolina Menjura,Reuniones,Datos Temáticos,5.3
+2025-04-25,Yair Morales,Reuniones,Mapa de Referencia,4.9
+2025-04-25,Daniel Gonzalez,Reuniones,Mapa de Referencia,4.4
+2025-04-25,Diana Carvajal,Trabajo autónomo,Análisis de Datos,4.3
+2025-04-25,Diana Carvajal,Reuniones,Mapa de Referencia,3.3
+2025-04-25,Diego Marin,Trabajo autónomo,Cartografía,3.3
+2025-04-25,Jairo Perdomo,Trabajo autónomo,Datos Temáticos,1.0
+2025-04-25,Jairo Perdomo,Reuniones,Mapa de Referencia,6.6
+2025-04-25,Laura Rodríguez,Trabajo autónomo,Mapa de Referencia,6.9
+2025-04-25,Luz Carolina Galvis,Trabajo autónomo,Mapa de Referencia,6.3
+2025-04-25,Luz Carolina Galvis,Reuniones,Análisis de Datos,6.4
+2025-04-25,Martha Vargas,Trabajo autónomo,Análisis de Datos,6.2
+2025-04-25,Martha Vargas,Reuniones,Datos Temáticos,4.4
+2025-04-26,Cesar Ramirez,Trabajo autónomo,Datos Temáticos,7.6
+2025-04-26,Cristian Martínez,Trabajo autónomo,Análisis de Datos,4.8
+2025-04-26,Nestor Roldan,Trabajo autónomo,Cartografía,3.9
+2025-04-26,Nestor Roldan,Reuniones,Mapa de Referencia,4.6
+2025-04-26,Hernan Bernal,Trabajo autónomo,Mapa de Referencia,4.7
+2025-04-26,Daniel Morales,Trabajo autónomo,Mapa de Referencia,4.8
+2025-04-26,Daniel Morales,Reuniones,Datos Temáticos,3.8
+2025-04-26,Leila Awad,Trabajo autónomo,Mapa de Referencia,2.1
+2025-04-26,Ninfa Carolina Menjura,Trabajo autónomo,Mapa de Referencia,7.1
+2025-04-26,Yair Morales,Reuniones,Cartografía,7.7
+2025-04-26,Diana Carvajal,Trabajo autónomo,Mapa de Referencia,6.2
+2025-04-26,Diana Carvajal,Reuniones,Análisis de Datos,3.0
+2025-04-26,Diego Marin,Trabajo autónomo,Cartografía,3.0
+2025-04-26,Jairo Perdomo,Trabajo autónomo,Cartografía,3.3
+2025-04-26,Jairo Perdomo,Reuniones,Cartografía,3.1
+2025-04-26,Laura Rodríguez,Trabajo autónomo,Datos Temáticos,7.6
+2025-04-26,Laura Rodríguez,Reuniones,Datos Temáticos,1.4
+2025-04-26,Luz Carolina Galvis,Trabajo autónomo,Cartografía,6.5
+2025-04-26,Luz Carolina Galvis,Reuniones,Mapa de Referencia,4.7
+2025-04-26,Maria Bernate,Reuniones,Análisis de Datos,8.0
+2025-04-26,Martha Vargas,Trabajo autónomo,Cartografía,5.7
+2025-04-26,Martha Vargas,Reuniones,Análisis de Datos,1.4
+2025-04-27,Cesar Ramirez,Trabajo autónomo,Mapa de Referencia,7.1
+2025-04-27,Cesar Ramirez,Reuniones,Mapa de Referencia,4.1
+2025-04-27,Cristian Martínez,Trabajo autónomo,Cartografía,4.9
+2025-04-27,Nestor Roldan,Trabajo autónomo,Mapa de Referencia,4.6
+2025-04-27,Nestor Roldan,Reuniones,Datos Temáticos,4.7
+2025-04-27,Hernan Bernal,Trabajo autónomo,Mapa de Referencia,2.2
+2025-04-27,Daniel Morales,Trabajo autónomo,Cartografía,6.5
+2025-04-27,Leila Awad,Trabajo autónomo,Datos Temáticos,1.9
+2025-04-27,Leila Awad,Reuniones,Análisis de Datos,3.6
+2025-04-27,Ninfa Carolina Menjura,Trabajo autónomo,Mapa de Referencia,1.7
+2025-04-27,Ninfa Carolina Menjura,Reuniones,Análisis de Datos,3.0
+2025-04-27,Yair Morales,Trabajo autónomo,Datos Temáticos,6.8
+2025-04-27,Yair Morales,Reuniones,Mapa de Referencia,1.1
+2025-04-27,Diana Carvajal,Reuniones,Datos Temáticos,6.6
+2025-04-27,Diego Marin,Trabajo autónomo,Mapa de Referencia,6.7
+2025-04-27,Jairo Perdomo,Reuniones,Datos Temáticos,1.2
+2025-04-27,Laura Rodríguez,Reuniones,Mapa de Referencia,6.9
+2025-04-27,Luz Carolina Galvis,Trabajo autónomo,Análisis de Datos,1.7
+2025-04-27,Luz Carolina Galvis,Reuniones,Análisis de Datos,3.5
+2025-04-27,Maria Bernate,Trabajo autónomo,Datos Temáticos,6.9
+2025-04-27,Maria Bernate,Reuniones,Datos Temáticos,3.0
+2025-04-27,Martha Vargas,Trabajo autónomo,Análisis de Datos,4.4
+2025-04-28,Cesar Ramirez,Reuniones,Mapa de Referencia,4.6
+2025-04-28,Cristian Martínez,Trabajo autónomo,Cartografía,1.3
+2025-04-28,Cristian Martínez,Reuniones,Análisis de Datos,6.8
+2025-04-28,Nestor Roldan,Reuniones,Análisis de Datos,5.1
+2025-04-28,Hernan Bernal,Trabajo autónomo,Análisis de Datos,7.9
+2025-04-28,Hernan Bernal,Reuniones,Cartografía,7.2
+2025-04-28,Daniel Morales,Reuniones,Cartografía,4.5
+2025-04-28,Leila Awad,Trabajo autónomo,Datos Temáticos,5.9
+2025-04-28,Ninfa Carolina Menjura,Trabajo autónomo,Datos Temáticos,1.6
+2025-04-28,Yair Morales,Trabajo autónomo,Análisis de Datos,4.4
+2025-04-28,Yair Morales,Reuniones,Cartografía,4.7
+2025-04-28,Daniel Gonzalez,Reuniones,Cartografía,7.7
+2025-04-28,Diego Marin,Trabajo autónomo,Análisis de Datos,4.4
+2025-04-28,Diego Marin,Reuniones,Análisis de Datos,6.7
+2025-04-28,Jairo Perdomo,Trabajo autónomo,Análisis de Datos,7.8
+2025-04-28,Laura Rodríguez,Trabajo autónomo,Datos Temáticos,7.1
+2025-04-28,Luz Carolina Galvis,Reuniones,Mapa de Referencia,2.8
+2025-04-28,Maria Bernate,Trabajo autónomo,Datos Temáticos,4.2
+2025-04-28,Maria Bernate,Reuniones,Cartografía,5.9
+2025-04-28,Martha Vargas,Trabajo autónomo,Mapa de Referencia,7.8
+2025-04-28,Martha Vargas,Reuniones,Análisis de Datos,7.7
+2025-04-29,Cesar Ramirez,Trabajo autónomo,Datos Temáticos,4.1
+2025-04-29,Cristian Martínez,Trabajo autónomo,Cartografía,5.7
+2025-04-29,Cristian Martínez,Reuniones,Datos Temáticos,4.9
+2025-04-29,Nestor Roldan,Trabajo autónomo,Mapa de Referencia,4.7
+2025-04-29,Nestor Roldan,Reuniones,Análisis de Datos,3.1
+2025-04-29,Daniel Morales,Trabajo autónomo,Datos Temáticos,5.3
+2025-04-29,Leila Awad,Trabajo autónomo,Cartografía,5.1
+2025-04-29,Leila Awad,Reuniones,Mapa de Referencia,5.1
+2025-04-29,Yair Morales,Trabajo autónomo,Cartografía,5.5
+2025-04-29,Yair Morales,Reuniones,Mapa de Referencia,3.6
+2025-04-29,Daniel Gonzalez,Trabajo autónomo,Análisis de Datos,1.1
+2025-04-29,Daniel Gonzalez,Reuniones,Datos Temáticos,7.7
+2025-04-29,Diana Carvajal,Trabajo autónomo,Datos Temáticos,7.3
+2025-04-29,Diana Carvajal,Reuniones,Análisis de Datos,7.3
+2025-04-29,Diego Marin,Reuniones,Mapa de Referencia,4.8
+2025-04-29,Jairo Perdomo,Trabajo autónomo,Cartografía,5.9
+2025-04-29,Jairo Perdomo,Reuniones,Mapa de Referencia,7.3
+2025-04-29,Laura Rodríguez,Reuniones,Datos Temáticos,5.1
+2025-04-29,Luz Carolina Galvis,Trabajo autónomo,Cartografía,2.1
+2025-04-29,Maria Bernate,Trabajo autónomo,Datos Temáticos,3.0
+2025-04-29,Martha Vargas,Trabajo autónomo,Cartografía,7.7
+2025-04-29,Martha Vargas,Reuniones,Datos Temáticos,2.0
+2025-04-30,Cesar Ramirez,Trabajo autónomo,Análisis de Datos,6.3
+2025-04-30,Cesar Ramirez,Reuniones,Cartografía,4.0
+2025-04-30,Cristian Martínez,Reuniones,Datos Temáticos,2.8
+2025-04-30,Nestor Roldan,Reuniones,Análisis de Datos,4.9
+2025-04-30,Hernan Bernal,Reuniones,Mapa de Referencia,5.1
+2025-04-30,Daniel Morales,Trabajo autónomo,Datos Temáticos,6.2
+2025-04-30,Daniel Morales,Reuniones,Análisis de Datos,4.7
+2025-04-30,Leila Awad,Trabajo autónomo,Análisis de Datos,7.1
+2025-04-30,Ninfa Carolina Menjura,Trabajo autónomo,Datos Temáticos,6.0
+2025-04-30,Ninfa Carolina Menjura,Reuniones,Mapa de Referencia,3.6
+2025-04-30,Yair Morales,Reuniones,Mapa de Referencia,3.5
+2025-04-30,Daniel Gonzalez,Trabajo autónomo,Cartografía,7.7
+2025-04-30,Daniel Gonzalez,Reuniones,Mapa de Referencia,4.6
+2025-04-30,Diana Carvajal,Reuniones,Datos Temáticos,5.0
+2025-04-30,Diego Marin,Trabajo autónomo,Análisis de Datos,7.2
+2025-04-30,Diego Marin,Reuniones,Mapa de Referencia,4.0
+2025-04-30,Jairo Perdomo,Trabajo autónomo,Mapa de Referencia,4.0
+2025-04-30,Jairo Perdomo,Reuniones,Datos Temáticos,2.1
+2025-04-30,Laura Rodríguez,Trabajo autónomo,Análisis de Datos,6.5
+2025-04-30,Laura Rodríguez,Reuniones,Cartografía,3.8
+2025-04-30,Maria Bernate,Reuniones,Análisis de Datos,2.4
+2025-04-30,Martha Vargas,Trabajo autónomo,Cartografía,1.7
+2025-04-30,Martha Vargas,Reuniones,Cartografía,7.7
