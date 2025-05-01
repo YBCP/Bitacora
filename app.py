@@ -601,10 +601,10 @@ if not st.session_state.authenticated:
             nombre_completo = st.text_input("Nombre Completo", key="nombre_completo")
             
             # Si no hay usuarios, permitir crear un administrador
-            if not st.session_state.users:
-                is_admin = st.checkbox("Crear como administrador", value=True)
-            else:
-                is_admin = st.checkbox("Crear como administrador", value=False)
+            #if not st.session_state.users:
+            #    is_admin = st.checkbox("Crear como administrador", value=True)
+            #else:
+            #    is_admin = st.checkbox("Crear como administrador", value=False)
             
             if st.button("Registrarse", use_container_width=True):
                 if new_password != confirm_password:
